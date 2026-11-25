@@ -725,8 +725,12 @@ mod tests {
             assert!(ecl_pos.is_finite());
             assert!(ecl_pos.length() > 0.9 * KM_PER_AU);
 
-            let mixed = orbit.into_mixed_orbit()?;
-            assert!(mixed.position_at_time(J2000 + 60.0).is_finite());
+            // The synthetic trajectory is nearly radial (negligible tangential velocity), so the
+            // Keplerian extrapolation outside the JPL window is degenerate (eccentricity >= 1).
+            assert!(matches!(
+                orbit.into_mixed_orbit(),
+                Err(OrbitError::InvalidEccentricity(_))
+            ));
         }
 
         let bad = JplEphemeris::from_bytes(&[0_u8; DE_NUM_OFFSET + 8]);
