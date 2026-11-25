@@ -22,10 +22,14 @@
 //! # Ok::<(), alestia_ephem::OrbitError>(())
 //! ```
 
+pub mod jpleph;
 pub mod nutation;
 pub mod orbit;
 pub mod precession;
 pub mod rotation;
+pub mod sampled;
+#[cfg(feature = "spice")]
+pub mod spice;
 
 /// Crate version string.
 pub const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");

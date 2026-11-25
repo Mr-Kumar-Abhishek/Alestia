@@ -36,6 +36,8 @@ jobs:
         run: cargo fmt --all -- --check
       - name: Enforce Clippy pedantic & strict lints (debug targets)
         run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: Enforce Clippy pedantic & strict lints (spice feature)
+        run: cargo clippy -p alestia-ephem --features spice --all-targets -- -D warnings
       - name: Enforce Clippy pedantic & strict lints (release targets)
         run: cargo clippy --workspace --release --all-targets -- -D warnings
       - name: Enforce Clippy pedantic & strict lints (WASM debug targets)
@@ -87,6 +89,8 @@ jobs:
         run: cargo build --workspace --all-targets --profile dev
       - name: Run unit and integration tests (debug build)
         run: cargo nextest run --workspace --cargo-profile dev --no-fail-fast
+      - name: Run unit tests for alestia-ephem with spice feature
+        run: cargo nextest run -p alestia-ephem --features spice --cargo-profile dev --no-fail-fast
       - name: Run doc-tests (debug build)
         run: cargo test --doc --workspace --profile dev
 
