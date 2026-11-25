@@ -729,7 +729,7 @@ mod tests {
         }
 
         let bad = JplEphemeris::from_bytes(&[0_u8; DE_NUM_OFFSET + 8]);
-        assert_eq!(bad, Err(JplEphemerisError::InvalidDeNumber));
+        assert!(matches!(bad, Err(JplEphemerisError::InvalidDeNumber)));
         Ok(())
     }
 }
