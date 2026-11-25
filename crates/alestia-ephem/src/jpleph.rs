@@ -9,7 +9,9 @@ use alestia_astro::{J2000_OBLIQUITY, SOLAR_MASS};
 use alestia_math::{DVec3, x_rotation};
 use alestia_util::{BinaryError, BinaryReader};
 
-use crate::orbit::{MixedOrbit, Orbit, OrbitError, OrbitSample, adaptive_sample_orbit};
+use crate::orbit::{
+    AdaptiveSamplingParams, MixedOrbit, Orbit, OrbitError, OrbitSample, adaptive_sample_orbit,
+};
 
 /// Number of ephemeris tables in a standard JPL binary header (`Mercury..Pluto`, `Moon`, `Sun`,
 /// and 2-component nutation).
@@ -448,7 +450,12 @@ impl Orbit for JplOrbit {
     }
 
     fn sample(&self, start_time: f64, end_time: f64) -> Vec<OrbitSample> {
-        adaptive_sample_orbit(self, start_time, end_time)
+        adaptive_sample_orbit(
+            self,
+            start_time,
+            end_time,
+            AdaptiveSamplingParams::for_span(end_time - start_time),
+        )
     }
 }
 

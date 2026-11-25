@@ -11,7 +11,7 @@ use std::sync::Arc;
 use alestia_astro::J2000_OBLIQUITY;
 use alestia_math::{DMat3, DQuat, DVec3, x_rotation};
 
-use crate::orbit::{Orbit, OrbitSample, adaptive_sample_orbit};
+use crate::orbit::{AdaptiveSamplingParams, Orbit, OrbitSample, adaptive_sample_orbit};
 use crate::rotation::RotationModel;
 
 const DEFAULT_SOLAR_SYSTEM_BOUNDING_KM: f64 = 1.0e9;
@@ -256,7 +256,12 @@ impl Orbit for SpiceOrbit {
     }
 
     fn sample(&self, start_time: f64, end_time: f64) -> Vec<OrbitSample> {
-        adaptive_sample_orbit(self, start_time, end_time)
+        adaptive_sample_orbit(
+            self,
+            start_time,
+            end_time,
+            AdaptiveSamplingParams::for_span(end_time - start_time),
+        )
     }
 }
 

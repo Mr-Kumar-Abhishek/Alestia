@@ -145,9 +145,9 @@ impl HermiteSegment {
     }
 
     fn eval_velocity(self) -> DVec3 {
-        let coeff_a3 = 3.0 * (2.0 * (self.pos0 - self.pos1) + self.vel1 + self.vel0);
-        let coeff_b2 = 2.0 * (3.0 * (self.pos1 - self.pos0) - 2.0 * self.vel0 - self.vel1);
-        (self.vel0 + self.frac * (coeff_b2 + self.frac * coeff_a3)) * self.inv_dt
+        let cubic_coeff_3 = 3.0 * (2.0 * (self.pos0 - self.pos1) + self.vel1 + self.vel0);
+        let quad_coeff_2 = 2.0 * (3.0 * (self.pos1 - self.pos0) - 2.0 * self.vel0 - self.vel1);
+        (self.vel0 + self.frac * (quad_coeff_2 + self.frac * cubic_coeff_3)) * self.inv_dt
     }
 }
 
