@@ -29,8 +29,9 @@ jobs:
         with:
           tool: taplo
       - name: Enforce strict TOML formatting and linting
+        shell: bash
         run: |
-          taplo fmt --check
+          taplo fmt --check || (taplo fmt --diff && exit 1)
           taplo lint
       - name: Enforce Tier-1 unsafe_code forbid policy
         shell: bash
