@@ -870,7 +870,7 @@ mod tests {
     #[test]
     fn upstream_kepler_elliptical_orbits_roundtrip() -> Result<(), String> {
         let periods = [50.0, 1200.0];
-        let inclinations = [0.0, 30.0, 90.0, 150.0, 180.0];
+        let inclinations: [f64; 5] = [0.0, 30.0, 90.0, 150.0, 180.0];
         let angles = [-180.0, -150.0, -90.0, -40.0, 0.0, 40.0, 90.0, 150.0, 180.0];
         let eccentricities = [0.0, 0.2, 0.6];
 
@@ -914,7 +914,7 @@ mod tests {
     #[test]
     fn upstream_kepler_hyperbolic_orbits_roundtrip() -> Result<(), String> {
         let periods = [50.0, 1200.0];
-        let inclinations = [0.0, 30.0, 90.0, 150.0, 180.0];
+        let inclinations: [f64; 5] = [0.0, 30.0, 90.0, 150.0, 180.0];
         let angles = [-180.0, -150.0, -90.0, -40.0, 0.0, 40.0, 90.0, 150.0, 180.0];
         let eccentricities = [1.5, 2.4];
 
