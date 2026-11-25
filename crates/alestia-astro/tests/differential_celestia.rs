@@ -162,7 +162,7 @@ fn differential_coords_geometry_and_kepler_solver_vectors() -> Result<(), String
         }
 
         let ecc = 0.005 * f64::from(idx);
-        let mean_anom = pfmod(f64::from(idx) * 0.37, 6.28);
+        let mean_anom = pfmod(f64::from(idx) * 0.37, core::f64::consts::TAU);
         let kepler = solve_newton(
             |e| e - ecc * e.sin() - mean_anom,
             |e| 1.0 - ecc * e.cos(),
