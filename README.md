@@ -1,0 +1,31 @@
+# Alestia
+
+**Alestia** is a memory-safe, Test-Driven Development (TDD) Rust port and architectural re-engineering of [**Celestia**](https://github.com/cybernetics-decentral/Celestia) (`v1.7.0`, `git@github.com:cybernetics-decentral/Celestia.git`), a real-time 3D astronomical visualization and space simulation engine.
+
+## Highlights
+
+- **Memory-Safe Core:** Pure domain crates enforce `#![forbid(unsafe_code)]` with bounds-checked binary and catalog parsers.
+- **Data Parity:** Designed for full compatibility with `CelestiaContent` catalogs (`.ssc`, `.stc`, `.dsc`, `stars.dat`, `starnames.dat`, `.cmod`, `.3ds`, `.xyzv`, `.cel`, `.celx`, `cel://`, `celestia.cfg`).
+- **Modular Cargo Workspace:** 13 focused crates decoupling math, astrodynamics, ephemerides, asset loading, headless simulation, `wgpu`/WGSL rendering, scripting, desktop UI, and CLI tools.
+- **Strict TDD:** Every module is built Red–Green–Refactor with 1-to-1 parity to Celestia's unit, integration, and script test suites, plus property-based (`proptest`) and fuzz testing.
+
+## Developer Documentation
+
+See the full engineering documentation suite in [docs/developer/](docs/developer/README.md):
+
+- [Developer Hub & Crate DAG](docs/developer/README.md)
+- [01 — Software Development Life Cycle (SDLC)](docs/developer/01-SDLC.md)
+- [02 — Software Requirements Specification (SRS)](docs/developer/02-SRS.md)
+- [03 — Agile Scrum Sprint Plan & Backlog](docs/developer/03-AGILE-SPRINT-PLAN.md)
+- [04 — Rust TDD Guide](docs/developer/04-TDD-RUST-GUIDE.md)
+
+## Quick Start
+
+```bash
+cargo test --workspace
+cargo clippy --workspace --all-targets -- -D warnings
+```
+
+## License
+
+Alestia is free software; you can redistribute it and/or modify it under the terms of the **GNU General Public License v2.0 or later** (`GPL-2.0-or-later`), matching upstream Celestia (`Copyright © 2001-2026 Celestia Development Team` & Alestia contributors). See [LICENSE](LICENSE).
