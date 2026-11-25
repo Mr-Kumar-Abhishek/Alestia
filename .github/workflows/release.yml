@@ -120,6 +120,7 @@ jobs:
             PRERELEASE_FLAG="--prerelease"
           fi
           gh release create "${GITHUB_REF_NAME}" ./* \
+            --repo "${GITHUB_REPOSITORY}" \
             --title "Alestia ${GITHUB_REF_NAME}" \
             --generate-notes \
             ${PRERELEASE_FLAG}
