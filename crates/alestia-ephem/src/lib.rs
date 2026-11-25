@@ -30,6 +30,7 @@ pub mod rotation;
 pub mod sampled;
 #[cfg(feature = "spice")]
 pub mod spice;
+pub mod vsop87;
 
 /// Crate version string.
 pub const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
