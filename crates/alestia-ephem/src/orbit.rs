@@ -878,7 +878,7 @@ mod tests {
             let semimajor = (GM_SUN * square(period) / FOUR_PI_SQ).cbrt();
             for &mean_deg in &angles {
                 for &inc_deg in &inclinations {
-                    let nodes: &[f64] = if inc_deg == 0.0 || inc_deg == 180.0 {
+                    let nodes: &[f64] = if inc_deg == 0.0 || (inc_deg - 180.0).abs() < 1e-12 {
                         &[0.0]
                     } else {
                         &angles
@@ -922,7 +922,7 @@ mod tests {
             let semimajor = -(GM_SUN * square(period) / FOUR_PI_SQ).cbrt();
             for &mean_deg in &angles {
                 for &inc_deg in &inclinations {
-                    let nodes: &[f64] = if inc_deg == 0.0 || inc_deg == 180.0 {
+                    let nodes: &[f64] = if inc_deg == 0.0 || (inc_deg - 180.0).abs() < 1e-12 {
                         &[0.0]
                     } else {
                         &angles
@@ -987,7 +987,7 @@ mod tests {
         assert_eq!(fixed.velocity_at_time(J2000), DVec3::ZERO);
         assert!(!fixed.is_periodic());
         assert_eq!(fixed.period(), 1.0);
-        assert!(fixed.sample(0.0, 10.0).is_empty());
+        assert_eq!(fixed.sample(0.0, 10.0), Vec::new());
 
         let earth_elems = KeplerElements {
             semimajor_axis: 149_597_870.7,
@@ -1007,7 +1007,7 @@ mod tests {
         let p_after = mixed.position_at_time(J2000 + 150.0);
         assert!(p_in.is_finite() && p_before.is_finite() && p_after.is_finite());
         assert!(mixed.bounding_radius() >= earth.bounding_radius());
-        assert!(!mixed.sample(J2000 - 10.0, J2000 + 10.0).is_empty());
+        assert_ne!(mixed.sample(J2000 - 10.0, J2000 + 10.0), Vec::new());
 
         let cached = CachingOrbit::new(
             EllipticalOrbit::new(
