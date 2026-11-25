@@ -8,7 +8,7 @@
 
 ## 1. Red-Green-Refactor Discipline (CI/CD-First)
 
-Every feature, bugfix, and upstream Celestia port in Alestia follows a strict **Red -> Green -> Refactor** loop executed and verified on **GitHub Actions CI/CD** (no local Cargo builds are performed):
+Every feature, bugfix, and upstream Celestia port in Alestia follows a strict **Red -> Green -> Refactor** loop executed and verified on **GitHub Actions CI/CD** (no local Cargo builds are performed). **Mandatory Gate:** CI/CD build and test verification (`Alestia CI`) must pass 100% green before advancing to the next logical commit step.
 
 1. **RED — Write a failing test first:**
    - Express the `FR-*` requirement, edge case, or upstream regression in a `#[test]`, `proptest!`, or integration test file *before* writing implementation logic.

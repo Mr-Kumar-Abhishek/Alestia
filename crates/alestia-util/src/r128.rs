@@ -51,14 +51,14 @@ impl R128 {
 
     /// Return the lower 64 fractional bits.
     #[must_use]
-    #[allow(clippy::cast_sign_loss)]
+    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     pub const fn lo(self) -> u64 {
         (self.raw as u128) as u64
     }
 
     /// Return the upper 64 signed integer bits as a `u64` bit pattern.
     #[must_use]
-    #[allow(clippy::cast_sign_loss)]
+    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     pub const fn hi(self) -> u64 {
         ((self.raw as u128) >> 64) as u64
     }
@@ -170,13 +170,15 @@ impl R128 {
                 Some(Self::MIN)
             } else {
                 Some(Self {
-                    raw: -(mag as i128),
+                    raw: -(mag.cast_signed()),
                 })
             }
         } else if mag > (i128::MAX as u128) {
             None
         } else {
-            Some(Self { raw: mag as i128 })
+            Some(Self {
+                raw: mag.cast_signed(),
+            })
         }
     }
 
@@ -243,6 +245,7 @@ impl R128 {
     /// than 22 characters or with `len % 4 == 1`, rejects non-alphabet characters, and rejects
     /// non-zero unused trailing padding bits.
     #[must_use]
+    #[allow(clippy::cast_possible_truncation)]
     pub fn decode_base64(input: &str) -> Option<Self> {
         let trimmed = input.trim_end_matches('=');
         if trimmed.is_empty() {

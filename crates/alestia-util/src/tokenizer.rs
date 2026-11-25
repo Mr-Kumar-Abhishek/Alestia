@@ -274,20 +274,20 @@ impl<'a> Tokenizer<'a> {
         let b0 = self.input[self.pos];
         self.pos += 1;
 
-        let (expected_len, min_cp, mut cp) = if (b0 & 0xE0) == 0xC0 {
-            (2, 0x80_u32, u32::from(b0 & 0x1F))
-        } else if (b0 & 0xF0) == 0xE0 {
-            (3, 0x800_u32, u32::from(b0 & 0x0F))
-        } else if (b0 & 0xF8) == 0xF0 {
-            (4, 0x1_0000_u32, u32::from(b0 & 0x07))
-        } else {
-            return '\u{FFFD}';
+        let (expected_len, min_cp, mut cp) = match b0 {
+            0xC2..=0xDF => (2, 0x80_u32, u32::from(b0 & 0x1F)),
+            0xE0..=0xEF => (3, 0x800_u32, u32::from(b0 & 0x0F)),
+            0xF0..=0xF4 => (4, 0x1_0000_u32, u32::from(b0 & 0x07)),
+            _ => return '\u{FFFD}',
         };
 
         for _ in 1..expected_len {
             let Some(&cont) = self.input.get(self.pos) else {
                 return '\u{FFFD}';
             };
+            if cont == b'"' {
+                return '\u{FFFD}';
+            }
             self.pos += 1;
             if (cont & 0xC0) != 0x80 {
                 return '\u{FFFD}';
