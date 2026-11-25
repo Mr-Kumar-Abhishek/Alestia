@@ -66,7 +66,7 @@ pub const KM_PER_AU: f64 = 149_597_870.7;
 pub const AU_PER_LY: f64 = 63_241.077_084_266_28;
 
 /// Kilometers per parsec.
-pub const KM_PER_PARSEC: f64 = 3.085_677_581_491_367_3e13;
+pub const KM_PER_PARSEC: f64 = 3.085_677_581_491_367e13;
 
 /// Arcminutes per degree.
 pub const MINUTES_PER_DEG: f64 = 60.0;
