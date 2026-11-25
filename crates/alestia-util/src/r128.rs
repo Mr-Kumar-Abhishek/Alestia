@@ -44,7 +44,11 @@ impl R128 {
     /// Construct from Celestia's `(lo, hi)` 64-bit little-endian limb pair.
     #[must_use]
     pub const fn from_parts(lo: u64, hi: u64) -> Self {
-        let raw = ((u128::from(hi) << 64) | u128::from(lo)).cast_signed();
+        let [l0, l1, l2, l3, l4, l5, l6, l7] = lo.to_le_bytes();
+        let [h0, h1, h2, h3, h4, h5, h6, h7] = hi.to_le_bytes();
+        let raw = i128::from_le_bytes([
+            l0, l1, l2, l3, l4, l5, l6, l7, h0, h1, h2, h3, h4, h5, h6, h7,
+        ]);
         Self { raw }
     }
 
@@ -365,28 +369,31 @@ mod tests {
     }
 
     #[test]
-    fn deserialize_empty() {
-        let val = R128::decode_base64("").expect("empty decodes to zero");
+    fn deserialize_empty() -> Result<(), String> {
+        let val = R128::decode_base64("").ok_or("empty decodes to zero")?;
         assert_eq!(val.lo(), 0);
         assert_eq!(val.hi(), 0);
+        Ok(())
     }
 
     #[test]
-    fn deserialize_maximum() {
-        let val = R128::decode_base64(MAX_BASE64).expect("max decodes");
+    fn deserialize_maximum() -> Result<(), String> {
+        let val = R128::decode_base64(MAX_BASE64).ok_or("max decodes")?;
         assert_eq!(val.lo(), u64::MAX);
         assert_eq!(val.hi(), u64::MAX);
+        Ok(())
     }
 
     #[test]
-    fn ignore_trailing_equals() {
+    fn ignore_trailing_equals() -> Result<(), String> {
         let mut value = String::from("test/+01");
-        let expected = R128::decode_base64(&value).expect("valid base64");
+        let expected = R128::decode_base64(&value).ok_or("valid base64")?;
         for _ in 1..10 {
             value.push('=');
-            let actual = R128::decode_base64(&value).expect("trailing '=' ignored");
+            let actual = R128::decode_base64(&value).ok_or("trailing '=' ignored")?;
             assert_eq!(actual, expected);
         }
+        Ok(())
     }
 
     #[test]
@@ -400,19 +407,18 @@ mod tests {
     }
 
     #[test]
-    fn check_final_character() {
+    fn check_final_character() -> Result<(), String> {
         for length in 1..MAX_BASE64.len() {
             let mut bytes = vec![b'/'; length];
             for (i, &ch) in BASE64_ALPHABET.iter().enumerate() {
                 bytes[length - 1] = ch;
                 let expected = match length % 4 {
                     0 => true,
-                    1 => false,
                     2 => (i & 0xF) == 0,
                     3 => (i & 0x3) == 0,
-                    _ => unreachable!(),
+                    _ => false,
                 };
-                let s = std::str::from_utf8(&bytes).unwrap();
+                let s = std::str::from_utf8(&bytes).map_err(|e| e.to_string())?;
                 assert_eq!(
                     R128::decode_base64(s).is_some(),
                     expected,
@@ -420,6 +426,7 @@ mod tests {
                 );
             }
         }
+        Ok(())
     }
 
     #[test]
@@ -448,9 +455,9 @@ mod tests {
     }
 
     #[test]
-    fn arithmetic_and_bounds() {
+    fn arithmetic_and_bounds() -> Result<(), String> {
         let half = R128::from_f64(0.5);
-        let one = half.checked_add(half).unwrap();
+        let one = half.checked_add(half).ok_or("0.5 + 0.5 overflow")?;
         assert!((one.to_f64() - 1.0).abs() < 1e-15);
 
         let two = R128::from_f64(2.0);
@@ -461,6 +468,7 @@ mod tests {
 
         assert!(!R128::ZERO.is_out_of_bounds());
         assert!(R128::from_parts(0, (1_u64 << 62) + 1).is_out_of_bounds());
+        Ok(())
     }
 
     proptest! {
@@ -468,8 +476,12 @@ mod tests {
         fn r128_add_sub_roundtrip(a in -1_000_000.0_f64..1_000_000.0, b in -1_000_000.0_f64..1_000_000.0) {
             let ra = R128::from_f64(a);
             let rb = R128::from_f64(b);
-            let sum = ra.checked_add(rb).unwrap();
-            let diff = sum.checked_sub(rb).unwrap();
+            let Some(sum) = ra.checked_add(rb) else {
+                return Err(TestCaseError::fail("checked_add overflow"));
+            };
+            let Some(diff) = sum.checked_sub(rb) else {
+                return Err(TestCaseError::fail("checked_sub overflow"));
+            };
             prop_assert_eq!(diff, ra);
         }
 

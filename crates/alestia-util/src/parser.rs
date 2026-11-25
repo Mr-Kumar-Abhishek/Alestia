@@ -165,7 +165,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn parses_nested_ssc_style_hash() {
+    fn parses_nested_ssc_style_hash() -> Result<(), String> {
         let src = r#"
         {
             Class "planet"
@@ -181,21 +181,25 @@ mod tests {
         "#;
 
         let mut parser = Parser::from_str(src);
-        let root = parser.read_hash().expect("valid ssc block");
+        let root = parser.read_hash().map_err(|e| e.to_string())?;
         assert_eq!(root.get_string("Class"), Some("planet"));
         assert_eq!(root.get_number("Radius"), Some(6378.137));
         assert_eq!(root.get_bool("Visible"), Some(true));
 
-        let atmo = root.get("Atmosphere").unwrap().as_hash().unwrap();
+        let atmo = root
+            .get("Atmosphere")
+            .ok_or("missing Atmosphere")?
+            .as_hash()
+            .ok_or("Atmosphere not hash")?;
         assert_eq!(atmo.get_i64("Height"), Some(60));
         assert_eq!(atmo.get_vec3("Lower"), Some([0.43, 0.52, 0.65]));
         assert_eq!(atmo.get_number("MieAsymmetry"), Some(-0.85));
+        Ok(())
     }
 
     #[test]
     fn rejects_unterminated_group_with_line_number() {
         let mut parser = Parser::from_str("{\n  Radius 100\n");
-        let err = parser.read_hash().unwrap_err();
-        assert_eq!(err.line, 3);
+        assert_eq!(parser.read_hash().err().map(|e| e.line), Some(3));
     }
 }

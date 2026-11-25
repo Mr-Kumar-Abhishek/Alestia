@@ -167,16 +167,17 @@ mod tests {
     use super::*;
 
     #[test]
-    fn parse_hex_rgb_and_rgba() {
-        let rgb = Color::parse_hex("#123456").expect("valid hex6");
+    fn parse_hex_rgb_and_rgba() -> Result<(), String> {
+        let rgb = Color::parse_hex("#123456").ok_or("valid hex6")?;
         assert_eq!(rgb.to_rgba8(), [0x12, 0x34, 0x56, 0xFF]);
 
-        let rgba = Color::parse_hex("#12345678").expect("valid hex8");
+        let rgba = Color::parse_hex("#12345678").ok_or("valid hex8")?;
         assert_eq!(rgba.to_rgba8(), [0x12, 0x34, 0x56, 0x78]);
 
         assert_eq!(Color::parse_hex("123456"), None);
         assert_eq!(Color::parse_hex("#12345"), None);
         assert_eq!(Color::parse_hex("#zzzzzz"), None);
+        Ok(())
     }
 
     #[test]

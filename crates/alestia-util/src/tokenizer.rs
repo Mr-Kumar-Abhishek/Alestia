@@ -447,7 +447,7 @@ mod tests {
     }
 
     #[test]
-    fn parses_numbers_signs_and_trailing_exponents() {
+    fn parses_numbers_signs_and_trailing_exponents() -> Result<(), String> {
         let mut tok = Tokenizer::from_str(
             "0 0.0 12345 12345.0 32.75 1.2e6 2.3e+6 7.5e-1 1.2E6 2.3E+6 7.5E-1",
         );
@@ -473,13 +473,13 @@ mod tests {
 
         let mut neg = Tokenizer::from_str("-0 -0.0 -12345 -12345.0 -32.75 -1.2e6 -2.3e+6 -7.5e-1");
         assert_eq!(neg.next_token(), TokenType::Number);
-        let n0 = neg.number_f64().unwrap();
+        let n0 = neg.number_f64().ok_or("missing -0")?;
         assert_eq!(n0, -0.0);
         assert!(n0.is_sign_negative());
         assert_eq!(neg.number_i64(), Some(0));
 
         assert_eq!(neg.next_token(), TokenType::Number);
-        let n0f = neg.number_f64().unwrap();
+        let n0f = neg.number_f64().ok_or("missing -0.0")?;
         assert_eq!(n0f, -0.0);
         assert!(n0f.is_sign_negative());
         assert_eq!(neg.number_i64(), None);
@@ -503,6 +503,7 @@ mod tests {
         assert_eq!(sep.number_i64(), Some(123));
         assert_eq!(sep.next_token(), TokenType::BeginGroup);
         assert_eq!(sep.next_token(), TokenType::End);
+        Ok(())
     }
 
     #[test]

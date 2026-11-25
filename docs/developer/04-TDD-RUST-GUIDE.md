@@ -70,7 +70,7 @@ expect_used = "deny"
 panic = "deny"
 ```
 
-> **Note:** Test code (`#[cfg(test)]` and `tests/`) allows `unwrap_used` / `expect_used` / `panic` via `clippy.toml` (`allow-unwrap-in-tests = true`), while production library code must propagate typed errors.
+> **Note:** Both production and test code forbid `.unwrap()`, `.expect()`, and `panic!()` (`allow-unwrap-in-tests = false`, `allow-expect-in-tests = false`, `allow-panic-in-tests = false` in `clippy.toml`). Tests propagate errors via `-> Result<(), ...>` (`?`) or assert via `assert_eq!` / `assert!`.
 
 ### 2.2 C++ to Rust Dependency Mapping
 

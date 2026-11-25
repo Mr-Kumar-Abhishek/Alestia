@@ -13,8 +13,9 @@
 //! assert_eq!(replace_greek_letter_abbr("XI12 Bar"), "ξ¹² Bar");
 //!
 //! let mut parser = Parser::from_str(r#"{ Radius 6378.137 Class "planet" }"#);
-//! let obj = parser.read_hash().expect("valid catalog block");
+//! let obj = parser.read_hash()?;
 //! assert_eq!(obj.get_string("Class"), Some("planet"));
+//! # Ok::<(), alestia_util::ParseError>(())
 //! ```
 
 pub mod associative_array;

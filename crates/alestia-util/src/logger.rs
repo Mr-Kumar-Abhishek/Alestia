@@ -159,27 +159,26 @@ impl LogRingBuffer {
 mod tests {
     use super::*;
 
-    fn take_utf8(buf: &mut Vec<u8>) -> String {
-        let s = String::from_utf8(buf.clone()).expect("valid utf8");
-        buf.clear();
-        s
+    fn take_utf8(buf: &mut Vec<u8>) -> Result<String, String> {
+        let owned = std::mem::take(buf);
+        String::from_utf8(owned).map_err(|e| e.to_string())
     }
 
     #[test]
-    fn logger_info_level() {
+    fn logger_info_level() -> Result<(), String> {
         let mut logger = Logger::new(Level::Info, Vec::<u8>::new(), Vec::<u8>::new());
 
         logger.error(format_args!("number={}\n", 123));
-        assert_eq!(take_utf8(&mut logger.err_sink), "number=123\n");
+        assert_eq!(take_utf8(&mut logger.err_sink)?, "number=123\n");
         assert!(logger.log_sink().is_empty());
 
         logger.warn(format_args!("string={}\n", "foobar"));
-        assert_eq!(take_utf8(&mut logger.err_sink), "string=foobar\n");
+        assert_eq!(take_utf8(&mut logger.err_sink)?, "string=foobar\n");
         assert!(logger.log_sink().is_empty());
 
         logger.info(format_args!("hello world\n"));
         assert!(logger.err_sink().is_empty());
-        assert_eq!(take_utf8(&mut logger.log_sink), "hello world\n");
+        assert_eq!(take_utf8(&mut logger.log_sink)?, "hello world\n");
 
         logger.verbose(format_args!("hi there\n"));
         assert!(logger.err_sink().is_empty());
@@ -188,69 +187,74 @@ mod tests {
         logger.debug(format_args!("s={} e={}\n", 1, 'a'));
         assert!(logger.err_sink().is_empty());
         assert!(logger.log_sink().is_empty());
+        Ok(())
     }
 
     #[test]
-    fn logger_verbose_level() {
+    fn logger_verbose_level() -> Result<(), String> {
         let mut logger = Logger::new(Level::Verbose, Vec::<u8>::new(), Vec::<u8>::new());
 
         logger.error(format_args!("number={}\n", 123));
-        assert_eq!(take_utf8(&mut logger.err_sink), "number=123\n");
+        assert_eq!(take_utf8(&mut logger.err_sink)?, "number=123\n");
 
         logger.warn(format_args!("string={}\n", "foobar"));
-        assert_eq!(take_utf8(&mut logger.err_sink), "string=foobar\n");
+        assert_eq!(take_utf8(&mut logger.err_sink)?, "string=foobar\n");
 
         logger.info(format_args!("hello world\n"));
-        assert_eq!(take_utf8(&mut logger.log_sink), "hello world\n");
+        assert_eq!(take_utf8(&mut logger.log_sink)?, "hello world\n");
 
         logger.verbose(format_args!("hi there\n"));
-        assert_eq!(take_utf8(&mut logger.log_sink), "hi there\n");
+        assert_eq!(take_utf8(&mut logger.log_sink)?, "hi there\n");
 
         logger.debug(format_args!("s={} e={}\n", 1, 'a'));
         assert!(logger.err_sink().is_empty());
+        Ok(())
     }
 
     #[test]
-    fn logger_warning_level() {
+    fn logger_warning_level() -> Result<(), String> {
         let mut logger = Logger::new(Level::Warning, Vec::<u8>::new(), Vec::<u8>::new());
         logger.error(format_args!("err\n"));
-        assert_eq!(take_utf8(&mut logger.err_sink), "err\n");
+        assert_eq!(take_utf8(&mut logger.err_sink)?, "err\n");
         logger.warn(format_args!("warn\n"));
-        assert_eq!(take_utf8(&mut logger.err_sink), "warn\n");
+        assert_eq!(take_utf8(&mut logger.err_sink)?, "warn\n");
         logger.info(format_args!("info\n"));
         logger.verbose(format_args!("verb\n"));
         logger.debug(format_args!("dbg\n"));
         assert!(logger.log_sink().is_empty());
         assert!(logger.err_sink().is_empty());
+        Ok(())
     }
 
     #[test]
-    fn logger_error_level() {
+    fn logger_error_level() -> Result<(), String> {
         let mut logger = Logger::new(Level::Error, Vec::<u8>::new(), Vec::<u8>::new());
         logger.error(format_args!("err\n"));
-        assert_eq!(take_utf8(&mut logger.err_sink), "err\n");
+        assert_eq!(take_utf8(&mut logger.err_sink)?, "err\n");
         logger.warn(format_args!("warn\n"));
         logger.info(format_args!("info\n"));
         logger.verbose(format_args!("verb\n"));
         logger.debug(format_args!("dbg\n"));
         assert!(logger.log_sink().is_empty());
         assert!(logger.err_sink().is_empty());
+        Ok(())
     }
 
     #[test]
-    fn logger_debug_level() {
+    fn logger_debug_level() -> Result<(), String> {
         let mut logger = Logger::new(Level::Debug, Vec::<u8>::new(), Vec::<u8>::new());
         logger.error(format_args!("err\n"));
-        assert_eq!(take_utf8(&mut logger.err_sink), "err\n");
+        assert_eq!(take_utf8(&mut logger.err_sink)?, "err\n");
         logger.warn(format_args!("warn\n"));
-        assert_eq!(take_utf8(&mut logger.err_sink), "warn\n");
+        assert_eq!(take_utf8(&mut logger.err_sink)?, "warn\n");
         logger.info(format_args!("info\n"));
-        assert_eq!(take_utf8(&mut logger.log_sink), "info\n");
+        assert_eq!(take_utf8(&mut logger.log_sink)?, "info\n");
         logger.verbose(format_args!("verb\n"));
-        assert_eq!(take_utf8(&mut logger.log_sink), "verb\n");
+        assert_eq!(take_utf8(&mut logger.log_sink)?, "verb\n");
         logger.debug(format_args!("s={} e={}\n", 1, 'a'));
-        assert_eq!(take_utf8(&mut logger.err_sink), "s=1 e=a\n");
+        assert_eq!(take_utf8(&mut logger.err_sink)?, "s=1 e=a\n");
         assert!(logger.log_sink().is_empty());
+        Ok(())
     }
 
     #[test]

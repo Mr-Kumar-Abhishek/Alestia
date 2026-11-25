@@ -242,7 +242,7 @@ mod tests {
     }
 
     #[test]
-    fn color_from_vector3() {
+    fn color_from_vector3() -> Result<(), String> {
         let mut h = AssociativeArray::new();
         h.insert(
             "color",
@@ -253,21 +253,22 @@ mod tests {
             ]),
         );
 
-        let val = h.get("color").unwrap();
+        let val = h.get("color").ok_or("missing color")?;
         assert_eq!(val.value_type(), ValueType::Array);
 
-        let vec = h.get_vec3("color").unwrap();
+        let vec = h.get_vec3("color").ok_or("missing vec3")?;
         assert_eq!(vec, [0.23, 0.34, 0.45]);
 
-        let c = h.get_color("color").unwrap();
+        let c = h.get_color("color").ok_or("missing color3")?;
         assert!((c.red() - quantize_ref(0.23)).abs() < 1e-6);
         assert!((c.green() - quantize_ref(0.34)).abs() < 1e-6);
         assert!((c.blue() - quantize_ref(0.45)).abs() < 1e-6);
         assert!((c.alpha() - 1.0).abs() < 1e-6);
+        Ok(())
     }
 
     #[test]
-    fn color_from_vector4() {
+    fn color_from_vector4() -> Result<(), String> {
         let mut h = AssociativeArray::new();
         h.insert(
             "color",
@@ -279,28 +280,30 @@ mod tests {
             ]),
         );
 
-        let vec = h.get_vec4("color").unwrap();
+        let vec = h.get_vec4("color").ok_or("missing vec4")?;
         assert_eq!(vec, [0.23, 0.34, 0.45, 0.56]);
 
-        let c = h.get_color("color").unwrap();
+        let c = h.get_color("color").ok_or("missing color4")?;
         assert!((c.red() - quantize_ref(0.23)).abs() < 1e-6);
         assert!((c.green() - quantize_ref(0.34)).abs() < 1e-6);
         assert!((c.blue() - quantize_ref(0.45)).abs() < 1e-6);
         assert!((c.alpha() - quantize_ref(0.56)).abs() < 1e-6);
+        Ok(())
     }
 
     #[test]
-    fn color_from_hex_strings() {
+    fn color_from_hex_strings() -> Result<(), String> {
         let mut h = AssociativeArray::new();
         h.insert("color", Value::String(String::from("#123456")));
-        let c = h.get_color("color").unwrap();
+        let c = h.get_color("color").ok_or("missing hex6")?;
         assert!((c.red() - (f32::from(0x12_u8) / 255.0)).abs() < 1e-6);
         assert!((c.green() - (f32::from(0x34_u8) / 255.0)).abs() < 1e-6);
         assert!((c.blue() - (f32::from(0x56_u8) / 255.0)).abs() < 1e-6);
         assert!((c.alpha() - 1.0).abs() < 1e-6);
 
         h.insert("color", Value::String(String::from("#12345678")));
-        let c4 = h.get_color("color").unwrap();
+        let c4 = h.get_color("color").ok_or("missing hex8")?;
         assert!((c4.alpha() - (f32::from(0x78_u8) / 255.0)).abs() < 1e-6);
+        Ok(())
     }
 }
