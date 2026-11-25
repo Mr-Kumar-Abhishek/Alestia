@@ -352,7 +352,7 @@ mod tests {
     fn spherical_orbit_samples_uniformly() -> Result<(), Vsop87Error> {
         let orbit = Vsop87Orbit::new(Vsop87Body::Mercury)?;
         let samples = orbit.sample(J2000, J2000 + orbit.period());
-        assert!(!samples.is_empty());
+        assert_ne!(samples.len(), 0);
         Ok(())
     }
 }
