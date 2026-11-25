@@ -8,6 +8,10 @@ license.workspace = true
 
 [dependencies]
 alestia-util.workspace = true
+glam.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
 
 [lints]
 workspace = true

@@ -24,6 +24,7 @@ rust-version = "1.95"
 license = "GPL-2.0-or-later"
 
 [workspace.dependencies]
+glam = "0.30"
 proptest = "1"
 wasm-bindgen = "0.2"
 
