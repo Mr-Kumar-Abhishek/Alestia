@@ -26,7 +26,7 @@ struct NutationTerm {
     obl_sin: f64,
 }
 
-const IAU2000B_TABLE: [NutationTerm; 77] = [
+const IAU2000B_TABLE: [NutationTerm; 78] = [
     NutationTerm {
         m_moon_anom: 0,
         m_sun_anom: 0,

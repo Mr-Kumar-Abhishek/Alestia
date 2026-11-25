@@ -52,8 +52,8 @@ struct EclipticPrecessionTerm {
 const ECLIPTIC_PRECESSION_TERMS: [EclipticPrecessionTerm; 6] = [
     EclipticPrecessionTerm {
         p_cos: 486.230_527,
-        q_cos: 2559.065_245,
-        p_sin: -2578.462_809,
+        q_cos: 2_559.065_245,
+        p_sin: -2_578.462_809,
         q_sin: 485.116_645,
         period_centuries: 2308.98,
     },
@@ -65,17 +65,17 @@ const ECLIPTIC_PRECESSION_TERMS: [EclipticPrecessionTerm; 6] = [
         period_centuries: 1831.25,
     },
     EclipticPrecessionTerm {
-        p_cos: -1868.737_098,
+        p_cos: -1_868.737_098,
         q_cos: -957.399_054,
-        p_sin: 1007.593_090,
-        q_sin: -1930.464_338,
+        p_sin: 1_007.593_090,
+        q_sin: -1_930.464_338,
         period_centuries: 687.52,
     },
     EclipticPrecessionTerm {
-        p_cos: -1589.172_175,
+        p_cos: -1_589.172_175,
         q_cos: 493.021_354,
         p_sin: -423.035_168,
-        q_sin: -1634.905_683,
+        q_sin: -1_634.905_683,
         period_centuries: 729.97,
     },
     EclipticPrecessionTerm {
@@ -86,10 +86,10 @@ const ECLIPTIC_PRECESSION_TERMS: [EclipticPrecessionTerm; 6] = [
         period_centuries: 492.21,
     },
     EclipticPrecessionTerm {
-        p_cos: -2244.742_029,
+        p_cos: -2_244.742_029,
         q_cos: -339.969_833,
         p_sin: 221.240_093,
-        q_sin: -2131.745_072,
+        q_sin: -2_131.745_072,
         period_centuries: 708.13,
     },
 ];
@@ -104,28 +104,28 @@ struct PrecessionTerm {
 
 const PRECESSION_TERMS: [PrecessionTerm; 10] = [
     PrecessionTerm {
-        prec_cos: -6180.062_4,
+        prec_cos: -6_180.062_4,
         obl_cos: 807.904_635,
-        prec_sin: -2434.845_716,
-        obl_sin: -2056.455_197,
+        prec_sin: -2_434.845_716,
+        obl_sin: -2_056.455_197,
         period_centuries: 409.90,
     },
     PrecessionTerm {
-        prec_cos: -2721.869_299,
+        prec_cos: -2_721.869_299,
         obl_cos: -177.959_383,
         prec_sin: 538.034_071,
         obl_sin: -912.727_303,
         period_centuries: 396.15,
     },
     PrecessionTerm {
-        prec_cos: 1460.746_498,
+        prec_cos: 1_460.746_498,
         obl_cos: 371.942_696,
-        prec_sin: -1245.689_351,
+        prec_sin: -1_245.689_351,
         obl_sin: 447.71,
         period_centuries: 536.91,
     },
     PrecessionTerm {
-        prec_cos: -1838.488_899,
+        prec_cos: -1_838.488_899,
         obl_cos: -176.029_134,
         prec_sin: 529.220_775,
         obl_sin: -611.297_411,
@@ -186,8 +186,8 @@ pub fn ecliptic_precession_p03_lp(centuries: f64) -> EclipticPole {
     let t2 = centuries * centuries;
     let t3 = t2 * centuries;
 
-    let mut pa = 5750.804_069 + 0.194_831_1 * centuries - 0.000_167_39 * t2 - 4.8e-8 * t3;
-    let mut qa = -1673.999_018 + 0.347_445_9 * centuries + 0.000_112_43 * t2 - 6.4e-8 * t3;
+    let mut pa = 5_750.804_069 + 0.194_831_1 * centuries - 0.000_167_39 * t2 - 4.8e-8 * t3;
+    let mut qa = -1_673.999_018 + 0.347_445_9 * centuries + 0.000_112_43 * t2 - 6.4e-8 * t3;
 
     for term in &ECLIPTIC_PRECESSION_TERMS {
         let theta = TAU * centuries / term.period_centuries;
@@ -208,7 +208,7 @@ pub fn prec_obliquity_p03_lp(centuries: f64) -> PrecessionAngles {
     let t3 = t2 * centuries;
 
     let mut general_prec_pa =
-        7907.295_95 + 5044.374_034 * centuries - 0.007_134_73 * t2 + 6e-9 * t3;
+        7_907.295_95 + 5_044.374_034 * centuries - 0.007_134_73 * t2 + 6e-9 * t3;
     let mut obliquity_eps_a = 83_973.876_448 - 0.042_589_9 * centuries - 0.000_001_13 * t2;
 
     for term in &PRECESSION_TERMS {
@@ -233,13 +233,13 @@ pub fn equatorial_precession_angles_p03(centuries: f64) -> EquatorialPrecessionA
     let t5 = t4 * centuries;
 
     EquatorialPrecessionAngles {
-        zeta_a: 2.650_545 + 2306.083_227 * centuries + 0.298_849_9 * t2 + 0.018_018_28 * t3
+        zeta_a: 2.650_545 + 2_306.083_227 * centuries + 0.298_849_9 * t2 + 0.018_018_28 * t3
             - 0.000_005_971 * t4
             - 0.000_000_317_3 * t5,
-        z_a: -2.650_545 + 2306.077_181 * centuries + 1.092_734_8 * t2 + 0.018_268_37 * t3
+        z_a: -2.650_545 + 2_306.077_181 * centuries + 1.092_734_8 * t2 + 0.018_268_37 * t3
             - 0.000_028_596 * t4
             - 0.000_000_290_4 * t5,
-        theta_a: 2004.191_903 * centuries
+        theta_a: 2_004.191_903 * centuries
             - 0.429_493_4 * t2
             - 0.041_822_64 * t3
             - 0.000_007_089 * t4
@@ -292,7 +292,7 @@ pub fn prec_obliquity_p03(centuries: f64) -> PrecessionAngles {
     let t5 = t4 * centuries;
 
     PrecessionAngles {
-        general_prec_pa: 5028.796_195 * centuries + 1.105_434_8 * t2 + 0.000_079_64 * t3
+        general_prec_pa: 5_028.796_195 * centuries + 1.105_434_8 * t2 + 0.000_079_64 * t3
             - 0.000_023_857 * t4
             - 0.000_000_038_3 * t5,
         obliquity_eps_a: EPS0_ARCSEC - 46.836_769 * centuries - 0.000_183_1 * t2 + 0.002_003_4 * t3
