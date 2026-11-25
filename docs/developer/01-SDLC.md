@@ -75,7 +75,7 @@ Alestia uses **Trunk-Based Development** on `master` with short-lived topic bran
 | Crate Tier | Crates | Lint Attribute | Rules |
 |---|---|---|---|
 | **Tier 1 — Pure Domain & Parsers** | `alestia-util`, `alestia-math`, `alestia-astro`, `alestia-model`, `alestia-image`, `alestia-font`, `alestia-engine`, `alestia-core`, `alestia-tools` | `#![forbid(unsafe_code)]` | Zero `unsafe` blocks allowed. Bounds-checked slice/cursor reads (`checked_add`, `get`, `try_into`) replace C++ pointer arithmetic. |
-| **Tier 2 — Hardware, Scripting & Optional FFI** | `alestia-ephem`, `alestia-render`, `alestia-script`, `alestia-app` | `#![deny(unsafe_code)]` | `unsafe` permitted only inside isolated FFI/surface modules with `#[allow(unsafe_code)]`, mandatory `// SAFETY:` justification comment, and Miri or AddressSanitizer test coverage. |
+| **Tier 2 — Hardware, Scripting, WASM & Optional FFI** | `alestia-ephem`, `alestia-render`, `alestia-script`, `alestia-app`, `alestia-web` | `#![deny(unsafe_code)]` | `unsafe` permitted only inside isolated FFI/surface modules (or generated `wasm-bindgen` macro glue) with justified reason, `// SAFETY:` comments for manual blocks, and Miri/AddressSanitizer or WASM target test coverage. |
 
 ### 4.2 `GPL-2.0-or-later` License Compatibility (`cargo-deny`)
 
@@ -125,8 +125,9 @@ flowchart LR
 
 1. **Red-Green-Refactor** completed; unit and property tests pass on GitHub Actions CI/CD (`cargo nextest run`, verified via `gh run watch` / `gh run view`).
 2. Corresponding upstream Celestia tests (from `test/unit/`, `test/integration/`, or `test/scripts/`) pass in Rust on CI/CD.
-3. `lint-and-policy` CI job (`cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo deny check`) passes with zero warnings.
+3. `lint-and-policy` CI job (`taplo`, `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets -- -D warnings` on native & `wasm32-unknown-unknown`, `cargo deny check`) passes with zero warnings.
 4. Coverage threshold met in CI (`>= 95%` for `alestia-util`, `alestia-math`, `alestia-astro`, `alestia-ephem`; `>= 85%` workspace-wide via `cargo llvm-cov`).
+5. WebAssembly (`alestia-web`, `wasm32-unknown-unknown`) and GitHub Pages deployment (`pages.yml` -> `gh-pages`) build cleanly with zero `rustdoc` warnings.
 5. Differential comparison against Celestia v1.7.0 (or JPL Horizons) recorded in test fixtures where applicable.
 6. Public APIs documented with `///` doc comments and verified by `cargo test --doc` in CI.
 

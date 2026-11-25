@@ -25,6 +25,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
       - uses: taiki-e/install-action@v2
         with:
           tool: taplo
@@ -46,6 +47,10 @@ jobs:
         run: cargo clippy --workspace --all-targets -- -D warnings
       - name: Enforce Clippy pedantic & strict lints (release targets)
         run: cargo clippy --workspace --release --all-targets -- -D warnings
+      - name: Enforce Clippy pedantic & strict lints (WASM debug targets)
+        run: cargo clippy --workspace --lib --target wasm32-unknown-unknown -- -D warnings
+      - name: Enforce Clippy pedantic & strict lints (WASM release targets)
+        run: cargo clippy --workspace --lib --release --target wasm32-unknown-unknown -- -D warnings
       - uses: EmbarkStudios/cargo-deny-action@v2
 
   build-release:

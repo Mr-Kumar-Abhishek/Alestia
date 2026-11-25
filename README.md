@@ -6,7 +6,7 @@
 
 - **Memory-Safe Core:** Pure domain crates enforce `#![forbid(unsafe_code)]` with bounds-checked binary and catalog parsers.
 - **Data Parity:** Designed for full compatibility with `CelestiaContent` catalogs (`.ssc`, `.stc`, `.dsc`, `stars.dat`, `starnames.dat`, `.cmod`, `.3ds`, `.xyzv`, `.cel`, `.celx`, `cel://`, `celestia.cfg`).
-- **Modular Cargo Workspace:** 13 focused crates decoupling math, astrodynamics, ephemerides, asset loading, headless simulation, `wgpu`/WGSL rendering, scripting, desktop UI, and CLI tools.
+- **Modular Cargo Workspace:** 14 focused crates decoupling math, astrodynamics, ephemerides, asset loading, headless simulation, `wgpu`/WGSL rendering, scripting, desktop UI, CLI tools, and `wasm32-unknown-unknown` browser bindings (`alestia-web`).
 - **Strict TDD:** Every module is built Red–Green–Refactor with 1-to-1 parity to Celestia's unit, integration, and script test suites, plus property-based (`proptest`) and fuzz testing.
 
 ## Developer Documentation
@@ -23,7 +23,8 @@ See the full engineering documentation suite in [docs/developer/](docs/developer
 
 All builds, lints, license checks, cross-platform tests, coverage gates, and releases run on **GitHub Actions CI/CD** (no local builds are performed):
 
-- **Debug CI (`Alestia CI`, `.github/workflows/ci.yml`):** Triggers on every push/PR to `master`; runs `cargo fmt`, `cargo clippy -- -D warnings`, `cargo deny check`, **debug-profile** builds & tests (`--profile dev`) across Linux/Windows/macOS, and enforces `>= 85%` coverage via `cargo llvm-cov`.
+- **Debug CI (`Alestia CI`, `.github/workflows/ci.yml`):** Triggers on every push/PR to `master`; runs `taplo` TOML checks, `cargo fmt`, `cargo clippy -- -D warnings` (native & `wasm32-unknown-unknown`), `cargo deny check`, **debug-profile** builds & tests (`--profile dev`) across Linux/Windows/macOS, `wasm32-unknown-unknown` + `wasm-bindgen` verification, and enforces `>= 85%` coverage via `cargo llvm-cov`.
+- **WebAssembly & GitHub Pages (`Alestia Pages (WASM)`, `.github/workflows/pages.yml`):** Triggers on `master` pushes and `v*` tags; compiles `alestia-web` to `wasm32-unknown-unknown` (`--release`), generates `wasm-bindgen` bindings, builds Rust API docs (`cargo doc`), and deploys `web/` + WASM + API docs to the `gh-pages` branch ([live site](https://mr-kumar-abhishek.github.io/Alestia/)).
 - **Tagged Release CD (`Alestia Release`, `.github/workflows/release.yml`):** Triggers on `v*` Git tags; builds & tests `--release` binaries for Linux, Windows, and macOS, generates `SHA256SUMS.txt`, and publishes to GitHub Releases.
 
 ```powershell

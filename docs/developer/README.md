@@ -45,7 +45,7 @@ Metadata retrieved directly from `cybernetics-decentral/Celestia` via `gh`:
 
 ## 3. Cargo Workspace Architecture (C++ to Rust Mapping)
 
-Alestia decomposes Celestia's 13 C++ subdirectories into 13 focused Cargo crates organized in a strict acyclic dependency graph:
+Alestia decomposes Celestia's 13 C++ subdirectories into 13 core Cargo crates plus a WebAssembly browser binding crate (`alestia-web`), organized in a strict acyclic dependency graph:
 
 | # | Rust Workspace Crate | Upstream C++ Source (`file count`) | Core Responsibilities | `unsafe` Policy |
 |---|---|---|---|---|
@@ -62,6 +62,7 @@ Alestia decomposes Celestia's 13 C++ subdirectories into 13 focused Cargo crates
 | 11 | `alestia-core` | `src/celestia` (`core`) | `AlestiaCore` orchestration, `celestia.cfg` loader, `.stc`/`.ssc`/`.dsc` catalog loaders, `EclipseFinder`, bookmarks, views, HUD state | `#![forbid(unsafe_code)]` |
 | 12 | `alestia-app` | `src/celestia/qt` & `sdl` (`173` total in `celestia`) | Native desktop shell (`winit` + `egui`), Star/DSO/SolarSystem browsers, event finder, optional audio (`rodio`/`cpal`) & video capture | `#![deny(unsafe_code)]` |
 | 13 | `alestia-tools` | `src/tools` (`66`) | CLI tools: `3dstocmod`, `cmodfix`, `cmodsphere`, `xyzv2bin`, `spice2xyzv`, `stardb`, `xindex`, `vsop`, `atmosphere` | `#![forbid(unsafe_code)]` |
+| 14 | `alestia-web` | New (`wasm32-unknown-unknown`) | `wasm-bindgen` WebAssembly bindings & interactive browser demo deployed to `gh-pages` | `#![deny(unsafe_code)]` |
 
 ### Crate Dependency DAG
 

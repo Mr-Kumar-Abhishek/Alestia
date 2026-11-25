@@ -1,0 +1,18 @@
+[package]
+name = "alestia-web"
+description = "WebAssembly (wasm32-unknown-unknown) bindings and browser entrypoint for Alestia"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+alestia-core.workspace = true
+alestia-util.workspace = true
+wasm-bindgen.workspace = true
+
+[lints]
+workspace = true

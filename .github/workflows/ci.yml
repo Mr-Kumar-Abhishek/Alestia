@@ -16,6 +16,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
       - uses: taiki-e/install-action@v2
         with:
           tool: taplo
@@ -37,7 +38,38 @@ jobs:
         run: cargo clippy --workspace --all-targets -- -D warnings
       - name: Enforce Clippy pedantic & strict lints (release targets)
         run: cargo clippy --workspace --release --all-targets -- -D warnings
+      - name: Enforce Clippy pedantic & strict lints (WASM debug targets)
+        run: cargo clippy --workspace --lib --target wasm32-unknown-unknown -- -D warnings
+      - name: Enforce Clippy pedantic & strict lints (WASM release targets)
+        run: cargo clippy --workspace --lib --release --target wasm32-unknown-unknown -- -D warnings
       - uses: EmbarkStudios/cargo-deny-action@v2
+
+  wasm-build:
+    needs: lint-and-policy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - name: Build workspace libraries for wasm32-unknown-unknown (debug)
+        run: cargo build --workspace --lib --target wasm32-unknown-unknown --profile dev
+      - name: Resolve wasm-bindgen version from Cargo.lock
+        id: wb
+        shell: bash
+        run: |
+          WB_VER=$(awk '/^name = "wasm-bindgen"$/{f=1} f && /^version = /{gsub(/"/,"",$3); print $3; exit}' Cargo.lock)
+          test -n "${WB_VER}"
+          echo "version=${WB_VER}" >> "$GITHUB_OUTPUT"
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-bindgen-cli@${{ steps.wb.outputs.version }}
+      - name: Generate and verify WebAssembly JS bindings
+        shell: bash
+        run: |
+          wasm-bindgen --target web --out-dir dist-wasm/pkg target/wasm32-unknown-unknown/debug/alestia_web.wasm
+          test -s dist-wasm/pkg/alestia_web.js
+          test -s dist-wasm/pkg/alestia_web_bg.wasm
 
   test-matrix:
     needs: lint-and-policy
