@@ -1,0 +1,14 @@
+[package]
+name = "alestia-model"
+description = "3D mesh and material loaders (CMOD ASCII/binary, bounds-checked 3DS) for Alestia"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+alestia-math.workspace = true
+alestia-util.workspace = true
+
+[lints]
+workspace = true

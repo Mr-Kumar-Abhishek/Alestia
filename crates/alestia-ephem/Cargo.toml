@@ -1,0 +1,15 @@
+[package]
+name = "alestia-ephem"
+description = "Orbital mechanics, analytical ephemerides (VSOP87, TASS17), sampled trajectories, and rotations for Alestia"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+alestia-astro.workspace = true
+alestia-math.workspace = true
+alestia-util.workspace = true
+
+[lints]
+workspace = true

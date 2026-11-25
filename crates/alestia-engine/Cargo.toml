@@ -1,0 +1,16 @@
+[package]
+name = "alestia-engine"
+description = "Headless astronomical simulation engine (Universe, Observer, Octrees, DepthPartition) for Alestia"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+alestia-astro.workspace = true
+alestia-ephem.workspace = true
+alestia-math.workspace = true
+alestia-util.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,15 @@
+[package]
+name = "alestia-util"
+description = "Core utilities for Alestia (R128 fixed-point, catalog tokenizer/parser, natural sort, Greek, binary I/O, color, logger)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+
+[dev-dependencies]
+proptest.workspace = true
+
+[lints]
+workspace = true

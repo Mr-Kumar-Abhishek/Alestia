@@ -1,0 +1,14 @@
+[package]
+name = "alestia-astro"
+description = "Astronomical timekeeping (JD/UTC/TDB) and unit/photometric conversions for Alestia"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+alestia-math.workspace = true
+alestia-util.workspace = true
+
+[lints]
+workspace = true

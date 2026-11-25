@@ -1,0 +1,13 @@
+[package]
+name = "alestia-font"
+description = "TrueType/OpenType glyph rasterization and LTR/RTL text layout for Alestia"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+alestia-util.workspace = true
+
+[lints]
+workspace = true

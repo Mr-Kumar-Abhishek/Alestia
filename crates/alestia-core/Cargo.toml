@@ -1,0 +1,14 @@
+[package]
+name = "alestia-core"
+description = "Application orchestration, celestia.cfg loader, catalog loaders, and EclipseFinder for Alestia"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+alestia-engine.workspace = true
+alestia-script.workspace = true
+
+[lints]
+workspace = true
