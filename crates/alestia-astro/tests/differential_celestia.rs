@@ -55,8 +55,7 @@ fn differential_all_historical_leap_second_boundaries() -> Result<(), String> {
 }
 
 #[test]
-fn differential_500_ephemeris_dates_photometry_and_math_vectors() -> Result<(), String> {
-    // 1. Historical & modern Julian Date reference epochs matching Celestia C++ Date::operator double()
+fn differential_calendar_and_timescale_vectors() -> Result<(), String> {
     let calendar_golden = [
         (-4712, 1, 1, 12, 0, 0.0, 0.0),
         (1582, 10, 4, 12, 0, 0.0, 2_299_160.0), // Last day of Julian calendar
@@ -86,7 +85,6 @@ fn differential_500_ephemeris_dates_photometry_and_math_vectors() -> Result<(), 
         }
     }
 
-    // 2. Sweep 150 dates across 1972..2035 checking UTC<->TAI and UTC<->TDB reversibility
     for step in 0_i32..150 {
         let jd = 2_441_317.5 + f64::from(step) * 150.25;
         let utc_orig = Date::from_julian_date(jd);
@@ -105,8 +103,11 @@ fn differential_500_ephemeris_dates_photometry_and_math_vectors() -> Result<(), 
             return Err(format!("UTC<->TDB precision drift at step {step}"));
         }
     }
+    Ok(())
+}
 
-    // 3. Sweep 150 photometry + distance conversion vectors
+#[test]
+fn differential_photometry_and_unit_vectors() -> Result<(), String> {
     for idx in 1..=150 {
         let abs_mag = -10.0 + 0.2 * f32::from(u8::try_from(idx).unwrap_or(1));
         let dist_ly = 1.0 + 50.0 * f32::from(u8::try_from(idx).unwrap_or(1));
@@ -128,8 +129,15 @@ fn differential_500_ephemeris_dates_photometry_and_math_vectors() -> Result<(), 
             return Err("AU constant mismatch".to_owned());
         }
     }
+    assert_eq!(length_scale(LengthUnit::Kilometer), Some(1.0));
+    assert_eq!(time_scale(TimeUnit::Day), Some(1.0));
+    assert_eq!(angle_scale(AngleUnit::Degree), Some(1.0));
+    assert_eq!(mass_scale(MassUnit::EarthMass), Some(1.0));
+    Ok(())
+}
 
-    // 4. Sweep 120 coordinate, ray-intersection, frustum, and root-solver vectors
+#[test]
+fn differential_coords_geometry_and_kepler_solver_vectors() -> Result<(), String> {
     for idx in 1..=120 {
         let ra = f64::from(idx % 24) + 0.25;
         let dec = -85.0 + f64::from(idx) * 1.4;
@@ -181,9 +189,5 @@ fn differential_500_ephemeris_dates_photometry_and_math_vectors() -> Result<(), 
         frustum.test_sphere_f64(DVec3::new(0.0, 0.0, -500.0), 1.0),
         FrustumAspect::Inside
     );
-    assert_eq!(length_scale(LengthUnit::Kilometer), Some(1.0));
-    assert_eq!(time_scale(TimeUnit::Day), Some(1.0));
-    assert_eq!(angle_scale(AngleUnit::Degree), Some(1.0));
-    assert_eq!(mass_scale(MassUnit::EarthMass), Some(1.0));
     Ok(())
 }

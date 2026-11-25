@@ -212,7 +212,7 @@ impl LeapSecondTable {
     /// Returns [`LeapSecondsParseError`] if any non-comment line is malformed, non-monotonic,
     /// or yields an empty table.
     pub fn parse_nist_list(input: &str) -> Result<Self, LeapSecondsParseError> {
-        let mut records = Vec::new();
+        let mut records: Vec<LeapSecondRecord> = Vec::new();
         for (idx, raw_line) in input.lines().enumerate() {
             let line_num = idx + 1;
             let without_comment = raw_line.split('#').next().unwrap_or("");

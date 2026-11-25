@@ -128,7 +128,7 @@ pub fn anomaly(mean_anomaly: f64, eccentricity: f64) -> (f64, f64) {
     let two_pi = 2.0 * PI;
     let wrapped = mean_anomaly % two_pi;
     let mut eccentric = wrapped;
-    let mut residual = 1.0;
+    let mut residual = 1.0_f64;
     let mut iterations = 20_u32;
 
     while residual.abs() > TOL && iterations > 0 {
