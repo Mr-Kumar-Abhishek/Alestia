@@ -105,7 +105,7 @@ flowchart LR
 
 - [ ] **TDD Evidence:** Test commit or diff demonstrates test cases covering happy path, boundary conditions, and malformed input errors.
 - [ ] **SRS Traceability:** PR description links `FR-*` / `NFR-*` and `US-S*-*` IDs.
-- [ ] **No Silent Panics & Strict Lints:** Zero `.unwrap()` / `.expect()` in library crates on runtime/file input; all fallible paths return typed `thiserror` / `Error` enums. Formatting (`cargo fmt --check`), Clippy (`-D warnings` in debug & release), and `cargo deny check` pass in all scenarios; bare `#[allow(clippy::...)]` suppressions are disallowed (prefer safe conversions or justified `#[expect(..., reason = "...")]`).
+- [ ] **No Silent Panics & Strict Lints:** Zero `.unwrap()` / `.expect()` in library crates on runtime/file input; all fallible paths return typed `thiserror` / `Error` enums. Strict TOML (`taplo fmt --check` & `taplo lint`), Rust formatting (`cargo fmt --check`), Clippy (`-D warnings` in debug & release), and `cargo deny check` pass in all scenarios; bare `#[allow(clippy::...)]` suppressions are disallowed (prefer safe conversions or justified `#[expect(..., reason = "...")]`).
 - [ ] **Documentation:** Public structs, traits, and functions have Rustdoc comments (`#![warn(missing_docs)]` on public APIs) and runnable doc-tests where appropriate.
 - [ ] **Resource Safety:** Parsers enforce explicit size/count caps (preventing OOM from malicious `.3ds`/`.cmod`/`.ssc` headers).
 
