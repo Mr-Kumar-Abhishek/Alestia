@@ -301,7 +301,11 @@ mod tests {
 
 ## 6. GitHub Actions CI/CD Workflow Blueprint
 
-Implemented in `.github/workflows/ci.yml`:
-- **`lint-and-policy`:** `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets --all-features -- -D warnings`, `cargo deny check`.
-- **`test-matrix`:** `ubuntu-latest`, `windows-latest`, `macos-latest` running `cargo nextest run --workspace` + `cargo test --doc --workspace`.
-- **`coverage`:** `cargo llvm-cov nextest --workspace` enforcing minimum 85% line coverage.
+Implemented across two GitHub Actions workflows (no local builds):
+- **`.github/workflows/ci.yml` (`Alestia CI`):**
+  - **`lint-and-policy`:** `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo deny check`.
+  - **`test-matrix`:** `ubuntu-latest`, `windows-latest`, `macos-latest` building and running all unit, integration, and doc tests in **debug build** (`--profile dev` / `--cargo-profile dev`).
+  - **`coverage`:** `cargo llvm-cov nextest --workspace` enforcing minimum 85% line coverage.
+- **`.github/workflows/release.yml` (`Alestia Release`):**
+  - Triggers on `v*` Git tags (`git tag -a vX.Y.Z ... && git push origin vX.Y.Z`).
+  - Builds & tests `--release` binaries across `x86_64-unknown-linux-gnu`, `x86_64-pc-windows-msvc`, and `aarch64-apple-darwin`, computes `SHA256SUMS.txt`, and publishes directly to **GitHub Releases** via `gh release create`.

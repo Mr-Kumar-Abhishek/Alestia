@@ -1,0 +1,94 @@
+name: Alestia Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to package (when triggered manually)"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-release:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            ext: ""
+            archive: tar.gz
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            ext: ".exe"
+            archive: zip
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            ext: ""
+            archive: tar.gz
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - name: Run workspace test suite (release build)
+        run: cargo test --workspace --release --target ${{ matrix.target }}
+      - name: Build workspace binaries (release build)
+        run: cargo build --workspace --bins --release --target ${{ matrix.target }}
+      - name: Package release archive
+        shell: bash
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          if [ -n "${{ inputs.tag }}" ]; then
+            TAG="${{ inputs.tag }}"
+          fi
+          STAGE="alestia-${TAG}-${{ matrix.target }}"
+          mkdir -p "dist/${STAGE}"
+          cp "target/${{ matrix.target }}/release/alestia-app${{ matrix.ext }}" "dist/${STAGE}/"
+          cp "target/${{ matrix.target }}/release/alestia-tools${{ matrix.ext }}" "dist/${STAGE}/"
+          cp LICENSE README.md "dist/${STAGE}/"
+          mkdir -p artifacts
+          if [ "${{ matrix.archive }}" = "zip" ]; then
+            (cd dist && 7z a "../artifacts/${STAGE}.zip" "${STAGE}")
+          else
+            tar -C dist -czf "artifacts/${STAGE}.tar.gz" "${STAGE}"
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.target }}
+          path: artifacts/*
+
+  publish-release:
+    needs: build-release
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+          merge-multiple: true
+      - name: Generate SHA256SUMS and publish GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd release-artifacts
+          sha256sum * > SHA256SUMS.txt
+          PRERELEASE_FLAG=""
+          if [[ "${GITHUB_REF_NAME}" == *-* ]]; then
+            PRERELEASE_FLAG="--prerelease"
+          fi
+          gh release create "${GITHUB_REF_NAME}" ./* \
+            --title "Alestia ${GITHUB_REF_NAME}" \
+            --generate-notes \
+            ${PRERELEASE_FLAG}

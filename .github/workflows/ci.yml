@@ -31,10 +31,12 @@ jobs:
       - uses: taiki-e/install-action@v2
         with:
           tool: nextest
-      - name: Run unit and integration tests
-        run: cargo nextest run --workspace --no-fail-fast
-      - name: Run doc-tests
-        run: cargo test --doc --workspace
+      - name: Build debug workspace targets
+        run: cargo build --workspace --all-targets --profile dev
+      - name: Run unit and integration tests (debug build)
+        run: cargo nextest run --workspace --cargo-profile dev --no-fail-fast
+      - name: Run doc-tests (debug build)
+        run: cargo test --doc --workspace --profile dev
 
   coverage:
     runs-on: ubuntu-latest

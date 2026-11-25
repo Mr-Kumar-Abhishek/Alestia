@@ -19,15 +19,22 @@ See the full engineering documentation suite in [docs/developer/](docs/developer
 - [03 — Agile Scrum Sprint Plan & Backlog](docs/developer/03-AGILE-SPRINT-PLAN.md)
 - [04 — Rust TDD Guide](docs/developer/04-TDD-RUST-GUIDE.md)
 
-## CI/CD Build & Test Verification
+## CI/CD Build & Release Verification
 
-All builds, lints, license checks, cross-platform tests, and coverage gates run on **GitHub Actions CI/CD** (no local builds are performed):
+All builds, lints, license checks, cross-platform tests, coverage gates, and releases run on **GitHub Actions CI/CD** (no local builds are performed):
+
+- **Debug CI (`Alestia CI`, `.github/workflows/ci.yml`):** Triggers on every push/PR to `master`; runs `cargo fmt`, `cargo clippy -- -D warnings`, `cargo deny check`, **debug-profile** builds & tests (`--profile dev`) across Linux/Windows/macOS, and enforces `>= 85%` coverage via `cargo llvm-cov`.
+- **Tagged Release CD (`Alestia Release`, `.github/workflows/release.yml`):** Triggers on `v*` Git tags; builds & tests `--release` binaries for Linux, Windows, and macOS, generates `SHA256SUMS.txt`, and publishes to GitHub Releases.
 
 ```powershell
 # Push changes and watch the CI/CD pipeline via GitHub CLI
 git push origin master
 gh run list --repo Mr-Kumar-Abhishek/Alestia --limit 5
 gh run watch --repo Mr-Kumar-Abhishek/Alestia --exit-status
+
+# Cut a tagged release (triggers release.yml -> GitHub Releases)
+git tag -a v0.1.0-alpha.1 -m "Release v0.1.0-alpha.1"
+git push origin v0.1.0-alpha.1
 ```
 
 ## License
