@@ -147,12 +147,13 @@ impl R128 {
         let mid = (p00 >> 64) + (p01 & 0xFFFF_FFFF_FFFF_FFFF) + (p10 & 0xFFFF_FFFF_FFFF_FFFF);
         let lo64 = (p00 & 0xFFFF_FFFF_FFFF_FFFF) | ((mid & 0xFFFF_FFFF_FFFF_FFFF) << 64);
         let carry_to_mid_hi = mid >> 64;
-        let hi_sum = p11
-            .checked_add(p01 >> 64)
-            .and_then(|v| v.checked_add(p10 >> 64))
-            .and_then(|v| v.checked_add(carry_to_mid_hi));
-
-        let Some(hi128) = hi_sum else {
+        let Some(hi_s1) = p11.checked_add(p01 >> 64) else {
+            return None;
+        };
+        let Some(hi_s2) = hi_s1.checked_add(p10 >> 64) else {
+            return None;
+        };
+        let Some(hi128) = hi_s2.checked_add(carry_to_mid_hi) else {
             return None;
         };
 

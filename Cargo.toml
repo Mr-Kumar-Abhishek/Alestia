@@ -21,10 +21,8 @@ version = "0.1.0"
 edition = "2024"
 rust-version = "1.95"
 license = "GPL-2.0-or-later"
-repository = "https://github.com/Mr-Kumar-Abhishek/Alestia.git"
 
 [workspace.dependencies]
-thiserror = "2"
 proptest = "1"
 
 alestia-util = { path = "crates/alestia-util" }

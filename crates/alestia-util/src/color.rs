@@ -55,21 +55,21 @@ impl Color {
 
     /// Parse a `#rrggbb` or `#rrggbbaa` hexadecimal color string.
     #[must_use]
-    pub fn parse_hex(s: &str) -> Option<Self> {
-        let hex = s.strip_prefix('#')?;
+    pub fn parse_hex(input: &str) -> Option<Self> {
+        let hex = input.strip_prefix('#')?;
         match hex.len() {
             6 => {
-                let r = u8::from_str_radix(&hex[0..2], 16).ok()?;
-                let g = u8::from_str_radix(&hex[2..4], 16).ok()?;
-                let b = u8::from_str_radix(&hex[4..6], 16).ok()?;
-                Some(Self::from_rgb8(r, g, b))
+                let red = u8::from_str_radix(&hex[0..2], 16).ok()?;
+                let green = u8::from_str_radix(&hex[2..4], 16).ok()?;
+                let blue = u8::from_str_radix(&hex[4..6], 16).ok()?;
+                Some(Self::from_rgb8(red, green, blue))
             }
             8 => {
-                let r = u8::from_str_radix(&hex[0..2], 16).ok()?;
-                let g = u8::from_str_radix(&hex[2..4], 16).ok()?;
-                let b = u8::from_str_radix(&hex[4..6], 16).ok()?;
-                let a = u8::from_str_radix(&hex[6..8], 16).ok()?;
-                Some(Self::from_rgba8(r, g, b, a))
+                let red = u8::from_str_radix(&hex[0..2], 16).ok()?;
+                let green = u8::from_str_radix(&hex[2..4], 16).ok()?;
+                let blue = u8::from_str_radix(&hex[4..6], 16).ok()?;
+                let alpha = u8::from_str_radix(&hex[6..8], 16).ok()?;
+                Some(Self::from_rgba8(red, green, blue, alpha))
             }
             _ => None,
         }

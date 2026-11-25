@@ -39,7 +39,7 @@ fn compare_nat(a: &[u8], b: &[u8], fold_case: bool) -> Ordering {
             (Some(da), Some(db)) => {
                 if da.is_ascii_digit() && db.is_ascii_digit() {
                     let fractional = da == b'0' || db == b'0';
-                    let (ord, new_ai, new_bi) = if fractional {
+                    let (ord, adv_a, adv_b) = if fractional {
                         compare_left(&a[ai..], &b[bi..])
                     } else {
                         compare_right(&a[ai..], &b[bi..])
@@ -47,8 +47,8 @@ fn compare_nat(a: &[u8], b: &[u8], fold_case: bool) -> Ordering {
                     if ord != Ordering::Equal {
                         return ord;
                     }
-                    ai += new_ai;
-                    bi += new_bi;
+                    ai += adv_a;
+                    bi += adv_b;
                     continue;
                 }
 
