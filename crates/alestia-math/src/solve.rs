@@ -98,9 +98,9 @@ where
         return Err(SolveError::InvalidBracket);
     }
 
-    let mut midpoint = 0.5 * (lower + upper);
+    let mut midpoint = f64::midpoint(lower, upper);
     for iter in 0..max_iter {
-        midpoint = 0.5 * (lower + upper);
+        midpoint = f64::midpoint(lower, upper);
         let half_width = 0.5 * (upper - lower);
         if upper - lower < 2.0 * tolerance {
             return Ok(SolveResult {
@@ -284,17 +284,17 @@ where
     let mut estimate = initial;
     let mut last_error = f64::INFINITY;
     for iter in 1..=max_iter {
-        let fx = func(estimate);
-        let dfx = deriv(estimate);
-        let d2fx = second_deriv(estimate);
-        if !fx.is_finite() || !dfx.is_finite() || !d2fx.is_finite() {
+        let val = func(estimate);
+        let first_deriv = deriv(estimate);
+        let second_val = second_deriv(estimate);
+        if !val.is_finite() || !first_deriv.is_finite() || !second_val.is_finite() {
             return Err(SolveError::NonFiniteInput);
         }
-        let denom = 2.0 * dfx * dfx - fx * d2fx;
+        let denom = 2.0 * first_deriv * first_deriv - val * second_val;
         if denom == 0.0 {
             return Err(SolveError::ZeroDerivative);
         }
-        let step = (2.0 * fx * dfx) / denom;
+        let step = (2.0 * val * first_deriv) / denom;
         let next = estimate - step;
         if !next.is_finite() {
             return Err(SolveError::NonFiniteInput);
@@ -314,6 +314,52 @@ where
         last_estimate: estimate,
         last_error,
     })
+}
+
+struct BrentState {
+    left_x: f64,
+    right_x: f64,
+    contra_x: f64,
+    left_y: f64,
+    right_y: f64,
+    contra_y: f64,
+    step: f64,
+    prev_step: f64,
+}
+
+impl BrentState {
+    fn compute_step(&mut self, half_interval: f64, tol_act: f64) {
+        if self.prev_step.abs() >= tol_act && self.left_y.abs() > self.right_y.abs() {
+            let ratio = self.right_y / self.left_y;
+            let (mut num, mut den) = if (self.left_x - self.contra_x).abs() <= f64::EPSILON {
+                (2.0 * half_interval * ratio, 1.0 - ratio)
+            } else {
+                let ratio_c = self.left_y / self.contra_y;
+                let ratio_r = self.right_y / self.contra_y;
+                let p_iqi = ratio
+                    * (2.0 * half_interval * ratio_c * (ratio_c - ratio_r)
+                        - (self.right_x - self.left_x) * (ratio_r - 1.0));
+                let q_iqi = (ratio_c - 1.0) * (ratio_r - 1.0) * (ratio - 1.0);
+                (p_iqi, q_iqi)
+            };
+
+            if num > 0.0 {
+                den = -den;
+            } else {
+                num = -num;
+            }
+
+            let bound1 = 3.0 * half_interval * den - (tol_act * den).abs();
+            let bound2 = (self.prev_step * den).abs();
+            if 2.0 * num < bound1.min(bound2) {
+                self.prev_step = self.step;
+                self.step = num / den;
+                return;
+            }
+        }
+        self.step = half_interval;
+        self.prev_step = half_interval;
+    }
 }
 
 /// Brent's root-finding method (inverse quadratic interpolation, secant, and bisection hybrid).
@@ -338,23 +384,21 @@ where
         return Err(SolveError::InvalidBracket);
     }
 
-    let mut left_x = lower;
-    let mut right_x = upper;
-    let mut left_y = func(left_x);
-    let mut right_y = func(right_x);
+    let left_y = func(lower);
+    let right_y = func(upper);
     if !left_y.is_finite() || !right_y.is_finite() {
         return Err(SolveError::NonFiniteInput);
     }
     if left_y == 0.0 {
         return Ok(SolveResult {
-            root: left_x,
+            root: lower,
             error: 0.0,
             iterations: 0,
         });
     }
     if right_y == 0.0 {
         return Ok(SolveResult {
-            root: right_x,
+            root: upper,
             error: 0.0,
             iterations: 0,
         });
@@ -363,93 +407,64 @@ where
         return Err(SolveError::InvalidBracket);
     }
 
-    let mut contra_x = left_x;
-    let mut contra_y = left_y;
-    let mut step = right_x - left_x;
-    let mut prev_step = step;
+    let mut state = BrentState {
+        left_x: lower,
+        right_x: upper,
+        contra_x: lower,
+        left_y,
+        right_y,
+        contra_y: left_y,
+        step: upper - lower,
+        prev_step: upper - lower,
+    };
 
     for iter in 1..=max_iter {
-        if (right_y > 0.0 && contra_y > 0.0) || (right_y < 0.0 && contra_y < 0.0) {
-            contra_x = left_x;
-            contra_y = left_y;
-            step = right_x - left_x;
-            prev_step = step;
+        if state.right_y.signum() == state.contra_y.signum() {
+            state.contra_x = state.left_x;
+            state.contra_y = state.left_y;
+            state.step = state.right_x - state.left_x;
+            state.prev_step = state.step;
         }
-        if contra_y.abs() < right_y.abs() {
-            left_x = right_x;
-            right_x = contra_x;
-            contra_x = left_x;
-            left_y = right_y;
-            right_y = contra_y;
-            contra_y = left_y;
+        if state.contra_y.abs() < state.right_y.abs() {
+            state.left_x = state.right_x;
+            state.right_x = state.contra_x;
+            state.contra_x = state.left_x;
+            state.left_y = state.right_y;
+            state.right_y = state.contra_y;
+            state.contra_y = state.left_y;
         }
 
-        let tol_act = 2.0 * f64::EPSILON * right_x.abs() + 0.5 * tolerance;
-        let half_interval = 0.5 * (contra_x - right_x);
+        let tol_act = 2.0 * f64::EPSILON * state.right_x.abs() + 0.5 * tolerance;
+        let half_interval = 0.5 * (state.contra_x - state.right_x);
 
-        if half_interval.abs() <= tol_act || right_y == 0.0 {
+        if half_interval.abs() <= tol_act || state.right_y == 0.0 {
             return Ok(SolveResult {
-                root: right_x,
+                root: state.right_x,
                 error: half_interval.abs(),
                 iterations: iter,
             });
         }
 
-        if prev_step.abs() >= tol_act && left_y.abs() > right_y.abs() {
-            let ratio = right_y / left_y;
-            let (mut num, mut den) = if (left_x - contra_x).abs() <= f64::EPSILON {
-                let p_sec = 2.0 * half_interval * ratio;
-                let q_sec = 1.0 - ratio;
-                (p_sec, q_sec)
-            } else {
-                let ratio_c = left_y / contra_y;
-                let ratio_r = right_y / contra_y;
-                let p_iqi = ratio
-                    * (2.0 * half_interval * ratio_c * (ratio_c - ratio_r)
-                        - (right_x - left_x) * (ratio_r - 1.0));
-                let q_iqi = (ratio_c - 1.0) * (ratio_r - 1.0) * (ratio - 1.0);
-                (p_iqi, q_iqi)
-            };
-
-            if num > 0.0 {
-                den = -den;
-            } else {
-                num = -num;
-            }
-
-            let bound1 = 3.0 * half_interval * den - (tol_act * den).abs();
-            let bound2 = (prev_step * den).abs();
-            if 2.0 * num < bound1.min(bound2) {
-                prev_step = step;
-                step = num / den;
-            } else {
-                step = half_interval;
-                prev_step = step;
-            }
-        } else {
-            step = half_interval;
-            prev_step = step;
-        }
-
-        left_x = right_x;
-        left_y = right_y;
-        if step.abs() > tol_act {
-            right_x += step;
+        state.compute_step(half_interval, tol_act);
+        state.left_x = state.right_x;
+        state.left_y = state.right_y;
+        if state.step.abs() > tol_act {
+            state.right_x += state.step;
         } else if half_interval > 0.0 {
-            right_x += tol_act;
+            state.right_x += tol_act;
         } else {
-            right_x -= tol_act;
+            state.right_x -= tol_act;
         }
 
-        right_y = func(right_x);
-        if !right_y.is_finite() {
+        state.right_y = func(state.right_x);
+        if !state.right_y.is_finite() {
             return Err(SolveError::NonFiniteInput);
         }
     }
 
     Err(SolveError::MaxIterationsExceeded {
-        last_estimate: right_x,
-        last_error: 0.5 * (contra_x - right_x).abs(),
+        last_estimate: state.right_x,
+        last_error: 0.5 * (state.contra_x - state.right_x).abs(),
     })
 }
 
