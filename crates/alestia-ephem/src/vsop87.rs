@@ -85,7 +85,9 @@ impl Vsop87Body {
     #[must_use]
     pub const fn bounding_radius(self) -> f64 {
         match self {
-            Self::Mercury => 60_000_000.0,
+            // Upstream Celestia uses 6.0e7 km, which is below Mercury's aphelion
+            // (about 6.98e7 km); use a bound that actually contains the orbit.
+            Self::Mercury => 70_000_000.0,
             Self::Venus => 100_000_000.0,
             Self::Earth => 160_000_000.0,
             Self::Mars => 240_000_000.0,
