@@ -66,7 +66,7 @@ flowchart LR
 | **US-S1-04** | As a localization developer, I want `strnatcmp`, Greek substitution, and UTF-8/Unicode normalization (`FR-003`). | 8 | Port `strnatcmp_test.cpp`, `greek_test.cpp`, `unicode_test.cpp` semantics. |
 | **US-S1-05** | As a systems developer, I want endian-safe binary I/O, linear/sRGB `Color`, and structured logging (`FR-004`, `FR-005`). | 7 | Port `logger_test.cpp`; verify binary cursor EOF safety and sRGB<->linear accuracy (`1e-6`). |
 
-- **Sprint 1 Demo:** Run `cargo test -p alestia-util` and verify all utility unit & property tests pass with zero Clippy warnings.
+- **Sprint 1 Demo:** Trigger GitHub Actions CI (`gh run watch --repo Mr-Kumar-Abhishek/Alestia`) and confirm all utility unit, property, doc-test, Clippy, license, and coverage gates pass across Linux, Windows, and macOS.
 
 ---
 

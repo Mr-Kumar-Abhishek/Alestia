@@ -6,25 +6,25 @@
 
 ---
 
-## 1. Red-Green-Refactor Discipline in Rust
+## 1. Red-Green-Refactor Discipline (CI/CD-First)
 
-Every feature, bugfix, and upstream Celestia port in Alestia follows a strict **Red -> Green -> Refactor** loop:
+Every feature, bugfix, and upstream Celestia port in Alestia follows a strict **Red -> Green -> Refactor** loop executed and verified on **GitHub Actions CI/CD** (no local Cargo builds are performed):
 
 1. **RED — Write a failing test first:**
    - Express the `FR-*` requirement, edge case, or upstream regression in a `#[test]`, `proptest!`, or integration test file *before* writing implementation logic.
-   - Define the minimal public API signature (with `todo!()` if needed so the test compiles and **fails for the right reason**).
-   - Verify failure: `cargo test -p <crate> <test_name>`.
+   - Define the minimal public API signature (with `todo!()` if needed so the test compiles and **fails for the right reason** in CI).
 2. **GREEN — Write the simplest safe Rust to pass:**
-   - Implement clean, bounds-checked Rust (`Result<T, E>` via `thiserror`, zero `.unwrap()` on external inputs).
-   - Verify pass: `cargo test -p <crate>`.
-3. **REFACTOR — Improve design while keeping tests green:**
+   - Implement clean, bounds-checked Rust (`Result<T, E>` via `std::error::Error` / `thiserror`, zero `.unwrap()` on external inputs).
+   - Format `.rs` files cleanly (`rustfmt --edition 2024` or editor formatting), commit, push to GitHub, and watch CI pass.
+3. **REFACTOR — Improve design while keeping CI green:**
    - Extract shared helpers, add `///` Rustdoc comments + doc-tests, eliminate allocations in hot paths.
-   - Run full local quality gate:
+   - Push and verify the full GitHub Actions pipeline via `gh`:
      ```powershell
-     cargo fmt --all -- --check
-     cargo clippy --workspace --all-targets --all-features -- -D warnings
-     cargo test --workspace --all-features
-     cargo test --doc --workspace
+     git push origin master
+     gh run list --repo Mr-Kumar-Abhishek/Alestia --limit 5
+     gh run watch --repo Mr-Kumar-Abhishek/Alestia --exit-status
+     # On failure, inspect exact compiler/clippy/test logs:
+     gh run view <run-id> --repo Mr-Kumar-Abhishek/Alestia --log-failed
      ```
 
 ---

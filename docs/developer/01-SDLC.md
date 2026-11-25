@@ -40,7 +40,7 @@ flowchart TB
 | **1. Upstream Discovery & License Governance** | Inspect `cybernetics-decentral/Celestia` via `gh`; catalog C++ modules, shaders, test fixtures; verify `GPL-2.0-or-later` compatibility of all Rust crate dependencies. | Upstream baseline commit pinned (`134ff29`). | Module inventory, `GPL-2.0-or-later` dependency audit (`cargo-deny` allowlist). | Tech Lead, Maintainers |
 | **2. SRS Refinement & Numerical Budgets** | Convert C++ behaviors into testable `FR-*` and `NFR-*` specs; establish numerical tolerances (e.g., AU/mas bounds, sRGB delta-E). | Phase 1 inventory complete. | Updated [02-SRS.md](./02-SRS.md) & traceability matrix (RTM). | Product Owner, Domain Engineer |
 | **3. Architecture, ADR & Trait Contracts** | Define crate boundaries, public Rust traits (`Orbit`, `RotationModel`, `AssetLoader`, `RenderBackend`), and `unsafe` isolation boundaries; write Architecture Decision Records (ADRs). | Story meets Definition of Ready (DoR). | Approved ADR in `docs/adr/`, trait signatures without `todo!()` in public API. | Systems Architect |
-| **4. TDD Implementation (Red-Green-Refactor)** | Write failing Rust unit/property tests first (**Red**), implement minimal safe Rust to pass (**Green**), refactor for clarity and zero Clippy warnings (**Refactor**). | Trait contracts & test fixtures ready. | Passing `cargo nextest run` / `cargo test`, `cargo clippy -- -D warnings`, `cargo fmt --check`. | Feature Engineers |
+| **4. TDD Implementation (Red-Green-Refactor)** | Write failing Rust unit/property tests first (**Red**), implement minimal safe Rust to pass (**Green**), refactor for clarity and zero Clippy warnings (**Refactor**). All compilation, clippy, and test execution run exclusively on **GitHub Actions CI/CD** (monitored via `gh run`), with zero local builds required. | Trait contracts & test fixtures ready. | CI/CD passing `cargo fmt --check`, `cargo clippy -- -D warnings`, `cargo nextest run`, and `cargo test --doc`. | Feature Engineers |
 | **5. Verification, Differential Testing & Fuzzing** | Run differential tests vs C++ v1.7.0 / JPL Horizons, `cargo-fuzz` on parsers (`.3ds`, `.cmod`, `.ssc`, `.stc`, `.dsc`), `criterion` benchmarks, and headless `wgpu` image diffs. | Unit + integration tests green locally. | >=85% line coverage (`cargo-llvm-cov`), zero sanitizer/Miri issues, benchmark budgets met. | QA / Verification Lead |
 | **6. Release Engineering & Packaging** | Tag SemVer release, build cross-platform binaries (Windows x64, Linux x86_64/aarch64, macOS Universal), bundle `CelestiaContent` compatibility checks, generate SBOM. | Sprint Review sign-off & Release Checklist 100% green. | Signed release artifacts, `CHANGELOG.md`, `cargo-audit` clean report. | Release Engineer |
 | **7. Maintenance & Upstream Sync** | Monitor `cybernetics-decentral/Celestia` and `CelestiaProject/Celestia` via `gh`, triage regressions, backport critical fixes (e.g., depth partition, bounds checks). | Release live on `master`. | Triage issues opened in Sprint backlog within 48 hours of upstream fix. | Maintainer Rotation |
@@ -123,13 +123,12 @@ flowchart LR
 
 ### Definition of Done (Before Marking Story Complete)
 
-1. **Red-Green-Refactor** completed; unit and property tests pass via `cargo test` / `cargo nextest run`.
-2. Corresponding upstream Celestia tests (from `test/unit/`, `test/integration/`, or `test/scripts/`) pass in Rust.
-3. `cargo clippy --workspace --all-targets --all-features -- -D warnings` passes with zero warnings.
-4. `cargo fmt --all -- --check` passes.
-5. Coverage threshold met (`>= 95%` for `alestia-util`, `alestia-math`, `alestia-astro`, `alestia-ephem`; `>= 85%` workspace-wide).
-6. Differential comparison against Celestia v1.7.0 (or JPL Horizons) recorded in test fixtures where applicable.
-7. Public APIs documented with `///` doc comments and verified by `cargo test --doc`.
+1. **Red-Green-Refactor** completed; unit and property tests pass on GitHub Actions CI/CD (`cargo nextest run`, verified via `gh run watch` / `gh run view`).
+2. Corresponding upstream Celestia tests (from `test/unit/`, `test/integration/`, or `test/scripts/`) pass in Rust on CI/CD.
+3. `lint-and-policy` CI job (`cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo deny check`) passes with zero warnings.
+4. Coverage threshold met in CI (`>= 95%` for `alestia-util`, `alestia-math`, `alestia-astro`, `alestia-ephem`; `>= 85%` workspace-wide via `cargo llvm-cov`).
+5. Differential comparison against Celestia v1.7.0 (or JPL Horizons) recorded in test fixtures where applicable.
+6. Public APIs documented with `///` doc comments and verified by `cargo test --doc` in CI.
 
 ---
 

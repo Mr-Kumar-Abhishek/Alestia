@@ -19,11 +19,15 @@ See the full engineering documentation suite in [docs/developer/](docs/developer
 - [03 — Agile Scrum Sprint Plan & Backlog](docs/developer/03-AGILE-SPRINT-PLAN.md)
 - [04 — Rust TDD Guide](docs/developer/04-TDD-RUST-GUIDE.md)
 
-## Quick Start
+## CI/CD Build & Test Verification
 
-```bash
-cargo test --workspace
-cargo clippy --workspace --all-targets -- -D warnings
+All builds, lints, license checks, cross-platform tests, and coverage gates run on **GitHub Actions CI/CD** (no local builds are performed):
+
+```powershell
+# Push changes and watch the CI/CD pipeline via GitHub CLI
+git push origin master
+gh run list --repo Mr-Kumar-Abhishek/Alestia --limit 5
+gh run watch --repo Mr-Kumar-Abhishek/Alestia --exit-status
 ```
 
 ## License
