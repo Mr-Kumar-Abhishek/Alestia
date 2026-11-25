@@ -122,7 +122,6 @@ impl From<BinaryError> for JplEphemerisError {
 #[derive(Clone, Debug)]
 pub struct JplEphemeris {
     coeff_info: [JplCoeffInfo; JPL_EPH_N_ITEMS],
-    libration_coeff_info: JplCoeffInfo,
     start_date: f64,
     end_date: f64,
     days_per_interval: f64,
@@ -228,7 +227,6 @@ impl JplEphemeris {
 
         Ok(Self {
             coeff_info,
-            libration_coeff_info,
             start_date,
             end_date,
             days_per_interval,
@@ -321,7 +319,7 @@ impl JplEphemeris {
         let rec = &self.records[rec_idx];
         let info = self.coeff_info[item_idx];
         let n_coeffs = usize::try_from(info.n_coeffs).unwrap_or(0);
-        if n_coeffs < 2 || n_coeffs > MAX_CHEBYSHEV_COEFFS {
+        if !(2..=MAX_CHEBYSHEV_COEFFS).contains(&n_coeffs) {
             return DVec3::ZERO;
         }
         let base_offset = usize::try_from(info.offset).unwrap_or(0);

@@ -2,6 +2,7 @@ name: Alestia Release
 
 on:
   push:
+    branches: [debug]
     tags:
       - "v*"
   workflow_dispatch:

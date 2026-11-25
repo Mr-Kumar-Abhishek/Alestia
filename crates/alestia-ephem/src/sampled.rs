@@ -213,12 +213,12 @@ impl SampledOrbit {
         interpolation: TrajectoryInterpolation,
     ) -> Result<Self, SampleError> {
         let tokens = collect_ascii_tokens(input);
-        let mut iter = tokens.chunks_exact(4);
+        let (chunks, remainder) = tokens.as_chunks::<4>();
         let mut times = Vec::new();
         let mut positions = Vec::new();
         let mut last_time = f64::NEG_INFINITY;
 
-        for chunk in &mut iter {
+        for chunk in chunks {
             let tdb = parse_finite_f64(chunk[0].0, chunk[0].1)?;
             let pos = DVec3::new(
                 parse_finite_f64(chunk[1].0, chunk[1].1)?,
@@ -233,7 +233,7 @@ impl SampledOrbit {
             positions.push(to_celestia_coords(pos));
         }
 
-        if let Some(&(line, _)) = iter.remainder().first() {
+        if let Some(&(line, _)) = remainder.first() {
             return Err(SampleError::MalformedToken { line });
         }
 
@@ -460,13 +460,13 @@ impl SampledOrbitXyzv {
         interpolation: TrajectoryInterpolation,
     ) -> Result<Self, SampleError> {
         let tokens = collect_ascii_tokens(input);
-        let mut iter = tokens.chunks_exact(7);
+        let (chunks, remainder) = tokens.as_chunks::<7>();
         let mut times = Vec::new();
         let mut positions = Vec::new();
         let mut velocities = Vec::new();
         let mut last_time = f64::NEG_INFINITY;
 
-        for chunk in &mut iter {
+        for chunk in chunks {
             let tdb = parse_finite_f64(chunk[0].0, chunk[0].1)?;
             let pos = DVec3::new(
                 parse_finite_f64(chunk[1].0, chunk[1].1)?,
@@ -487,7 +487,7 @@ impl SampledOrbitXyzv {
             velocities.push(to_celestia_coords(vel * SECONDS_PER_DAY));
         }
 
-        if let Some(&(line, _)) = iter.remainder().first() {
+        if let Some(&(line, _)) = remainder.first() {
             return Err(SampleError::MalformedToken { line });
         }
 
@@ -776,13 +776,13 @@ impl SampledOrientation {
     /// [`SampleError::EmptySamples`].
     pub fn from_q_str(input: &str) -> Result<Self, SampleError> {
         let tokens = collect_ascii_tokens(input);
-        let mut iter = tokens.chunks_exact(5);
+        let (chunks, remainder) = tokens.as_chunks::<5>();
         let mut times = Vec::new();
         let mut rotations = Vec::new();
         let mut last_time = f64::NEG_INFINITY;
         let x_rot_90 = x_rotation(FRAC_PI_2);
 
-        for chunk in &mut iter {
+        for chunk in chunks {
             let tdb = parse_finite_f64(chunk[0].0, chunk[0].1)?;
             let qw = parse_finite_f64(chunk[1].0, chunk[1].1)?;
             let qx = parse_finite_f64(chunk[2].0, chunk[2].1)?;
@@ -800,7 +800,7 @@ impl SampledOrientation {
             rotations.push(raw.normalize() * x_rot_90);
         }
 
-        if let Some(&(line, _)) = iter.remainder().first() {
+        if let Some(&(line, _)) = remainder.first() {
             return Err(SampleError::MalformedToken { line });
         }
 
