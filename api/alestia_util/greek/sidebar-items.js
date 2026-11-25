@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["canonical_greek_abbreviation","replace_greek_letter","replace_greek_letter_abbr"]};

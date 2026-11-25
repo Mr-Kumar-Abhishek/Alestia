@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["XYZV_BIG_ENDIAN","XYZV_DOUBLE_DIGITS","XYZV_LITTLE_ENDIAN","XYZV_MAGIC"],"enum":["SampleError","TrajectoryInterpolation"],"fn":["from_celestia_coords","to_celestia_coords"],"struct":["OrientationKeyframe","SampledOrbit","SampledOrbitXyzv","SampledOrientation","XyzSample","XyzvSample"]};

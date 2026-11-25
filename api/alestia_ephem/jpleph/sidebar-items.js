@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["JPL_EPH_N_ITEMS","MAX_CHEBYSHEV_COEFFS"],"enum":["JplEphemItem","JplEphemerisError"],"struct":["JplCoeffInfo","JplEphemeris","JplOrbit","JplRecord"]};

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alestia — WebAssembly Astronomical Engine</title>
+    <link rel="stylesheet" href="./style.css" />
+    <script type="module" src="./app.js"></script>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero-inner">
+        <div class="title-row">
+          <h1>Alestia</h1>
+          <span id="wasm-badge" class="badge">Loading WebAssembly…</span>
+        </div>
+        <p class="subtitle">
+          Memory-safe Rust &amp; WebAssembly port of Celestia v1.7.0 — live core utilities running in your browser via
+          <code>wasm32-unknown-unknown</code>.
+        </p>
+        <nav class="links">
+          <a href="https://github.com/Mr-Kumar-Abhishek/Alestia" target="_blank" rel="noopener noreferrer">GitHub Repository</a>
+          <a href="https://github.com/Mr-Kumar-Abhishek/Alestia/releases" target="_blank" rel="noopener noreferrer">Releases</a>
+          <a href="./api/alestia_util/index.html">Rust API Docs</a>
+          <a href="./LICENSE">GPL-2.0-or-later License</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section class="card wide">
+        <h2>1. Celestia Catalog Parser (<code>.ssc</code> / <code>.stc</code> / <code>.dsc</code>)</h2>
+        <p>Parse Celestia property hashes in real time inside WebAssembly.</p>
+        <div class="split">
+          <label class="pane">
+            <span>Catalog Hash Input</span>
+            <textarea id="catalog-input" rows="8" spellcheck="false">{
+  Class "planet"
+  Radius 6378.137
+  Oblateness 0.00335
+  Color [0.42 0.68 1.0]
+  Atmosphere {
+    Height 60
+    Mie 0.001
+  }
+}</textarea>
+          </label>
+          <div class="pane">
+            <span>Parsed AssociativeArray Output</span>
+            <pre id="catalog-output" class="output"></pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>2. 128-bit Fixed-Point (<code>R128</code>) <code>cel://</code> Codec</h2>
+        <p>Convert floating-point coordinates to exact 64.64 Base64 strings and decode them back.</p>
+        <label class="field">
+          <span>Coordinate (<code>f64</code>)</span>
+          <input id="r128-number" type="number" step="any" value="149597870.7" />
+        </label>
+        <div class="output-inline">
+          <span class="label">Base64:</span>
+          <code id="r128-encoded"></code>
+        </div>
+        <label class="field">
+          <span>Decode Base64</span>
+          <input id="r128-base64" type="text" value="AAAAAAAAAAAn5oAAAAA=" spellcheck="false" />
+        </label>
+        <div class="output-inline">
+          <span class="label">Decoded:</span>
+          <code id="r128-decoded"></code>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>3. Bayer Greek Star Designations</h2>
+        <p>Expand Celestia 3-letter star abbreviations into canonical Unicode Greek symbols.</p>
+        <label class="field">
+          <span>Star Designations (one per line)</span>
+          <textarea id="greek-input" rows="4" spellcheck="false">ALF Cen
+BET Ori
+GAM Cru
+XI12 Bar</textarea>
+        </label>
+        <pre id="greek-output" class="output"></pre>
+      </section>
+
+      <section class="card">
+        <h2>4. Celestia Color Parser</h2>
+        <p>Parse <code>#rrggbb</code> / <code>#rrggbbaa</code> colors and compute IEC 61966-2-1 linear RGBA.</p>
+        <label class="field">
+          <span>Hex Color</span>
+          <input id="color-input" type="text" value="#38bdf8" spellcheck="false" />
+        </label>
+        <div class="color-row">
+          <div id="color-swatch" class="swatch" aria-label="Color preview"></div>
+          <pre id="color-output" class="output"></pre>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>5. Natural Astronomical Sort (<code>strnatcasecmp</code>)</h2>
+        <p>Sort catalog identifiers naturally rather than purely lexicographically.</p>
+        <div class="split">
+          <label class="pane">
+            <span>Unsorted Lines</span>
+            <textarea id="sort-input" rows="6" spellcheck="false">M31
+M1
+M10
+M2
+NGC 1976
+NGC 224</textarea>
+          </label>
+          <div class="pane">
+            <span>Sorted Output</span>
+            <pre id="sort-output" class="output"></pre>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      Built with Rust + <code>wasm-bindgen</code> · Deployed automatically via GitHub Actions to <code>gh-pages</code>.
+    </footer>
+  </body>
+</html>

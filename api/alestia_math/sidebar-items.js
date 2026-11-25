@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["CRATE_VERSION","DEPENDENCY_VERSIONS"],"mod":["frustum","geom","mathlib","rand","solve"],"struct":["DMat3","DMat4","DQuat","DVec2","DVec3","DVec4","Mat3","Mat4","Quat","Vec2","Vec3","Vec4"]};

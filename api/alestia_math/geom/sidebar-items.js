@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["look_at","ortho","ortho_2d","perspective","perspective_fov","project_fisheye","project_perspective","ray_ellipsoid_intersection","ray_ellipsoid_intersection_with_cos","ray_sphere_intersection","ray_sphere_intersection_with_cos","x_rotation","y_rotation","z_rotation"],"struct":["Ellipsoid","Ellipsoidf","Ray3","Ray3f","RayHit","Sphere","Spheref"]};

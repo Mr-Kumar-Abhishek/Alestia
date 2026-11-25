@@ -1,0 +1,2 @@
+window.ALL_CRATES = ["alestia_app","alestia_astro","alestia_core","alestia_engine","alestia_ephem","alestia_font","alestia_image","alestia_math","alestia_model","alestia_render","alestia_script","alestia_tools","alestia_util","alestia_web"];
+//{"start":21,"fragment_lengths":[13,16,15,17,16,15,16,15,16,17,17,16,15,14]}

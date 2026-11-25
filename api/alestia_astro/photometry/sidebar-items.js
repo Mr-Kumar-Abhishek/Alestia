@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["abs_mag_to_irradiance","abs_mag_to_lum","abs_to_app_mag","app_mag_to_lum","app_to_abs_mag","distance_modulus","exposure_to_faintest_mag","faintest_mag_to_exposure","irradiance_to_mag","lum_to_abs_mag","lum_to_app_mag","lum_to_irradiance","mag_to_irradiance","reflected_luminosity"]};

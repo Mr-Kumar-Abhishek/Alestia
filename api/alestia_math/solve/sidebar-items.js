@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["SolveError"],"fn":["solve_bisection","solve_brent","solve_halley","solve_iteration","solve_iteration_fixed","solve_newton"],"struct":["SolveResult"]};

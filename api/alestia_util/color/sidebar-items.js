@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["linear_to_srgb","srgb_to_linear"],"struct":["Color"]};

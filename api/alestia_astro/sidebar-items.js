@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["CRATE_VERSION","DEPENDENCY_VERSIONS"],"mod":["constants","coords","date","photometry","units"]};

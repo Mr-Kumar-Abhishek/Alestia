@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["ecliptic_precession_angles_p03","ecliptic_precession_p03","ecliptic_precession_p03_lp","equatorial_precession_angles_p03","prec_obliquity_p03","prec_obliquity_p03_lp"],"struct":["EclipticAngles","EclipticPole","EquatorialPrecessionAngles","PrecessionAngles"]};

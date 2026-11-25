@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["CachingRotationModel","ConstantOrientation","PrecessingRotationModel","UniformRotationModel"],"trait":["RotationModel"]};
