@@ -118,7 +118,7 @@ pub trait Orbit: Send + Sync {
             self.period()
         } else {
             let (valid_start, valid_end) = self.valid_range();
-            if valid_start == valid_end {
+            if valid_start.to_bits() == valid_end.to_bits() {
                 valid_end - valid_start
             } else {
                 end_time - start_time
@@ -766,7 +766,7 @@ impl<O: Orbit> Orbit for CachingOrbit<O> {
     fn position_at_time(&self, tdb: f64) -> DVec3 {
         {
             let guard = self.lock_cache();
-            if guard.last_time == tdb
+            if guard.last_time.to_bits() == tdb.to_bits()
                 && let Some(pos) = guard.position
             {
                 return pos;
@@ -774,7 +774,7 @@ impl<O: Orbit> Orbit for CachingOrbit<O> {
         }
         let computed = self.inner.position_at_time(tdb);
         let mut guard = self.lock_cache();
-        if guard.last_time != tdb {
+        if guard.last_time.to_bits() != tdb.to_bits() {
             guard.last_time = tdb;
             guard.velocity = None;
         }
@@ -785,7 +785,7 @@ impl<O: Orbit> Orbit for CachingOrbit<O> {
     fn velocity_at_time(&self, tdb: f64) -> DVec3 {
         {
             let guard = self.lock_cache();
-            if guard.last_time == tdb
+            if guard.last_time.to_bits() == tdb.to_bits()
                 && let Some(vel) = guard.velocity
             {
                 return vel;
@@ -793,7 +793,7 @@ impl<O: Orbit> Orbit for CachingOrbit<O> {
         }
         let computed = self.inner.velocity_at_time(tdb);
         let mut guard = self.lock_cache();
-        if guard.last_time != tdb {
+        if guard.last_time.to_bits() != tdb.to_bits() {
             guard.last_time = tdb;
             guard.position = None;
         }

@@ -254,7 +254,7 @@ impl<R: RotationModel> RotationModel for CachingRotationModel<R> {
     fn spin(&self, tdb: f64) -> DQuat {
         {
             let guard = self.lock_cache();
-            if guard.last_time == tdb
+            if guard.last_time.to_bits() == tdb.to_bits()
                 && let Some(cached) = guard.spin
             {
                 return cached;
@@ -262,7 +262,7 @@ impl<R: RotationModel> RotationModel for CachingRotationModel<R> {
         }
         let computed = self.inner.spin(tdb);
         let mut guard = self.lock_cache();
-        if guard.last_time != tdb {
+        if guard.last_time.to_bits() != tdb.to_bits() {
             guard.last_time = tdb;
             guard.equator = None;
             guard.angular_velocity = None;
@@ -274,7 +274,7 @@ impl<R: RotationModel> RotationModel for CachingRotationModel<R> {
     fn equator_orientation_at_time(&self, tdb: f64) -> DQuat {
         {
             let guard = self.lock_cache();
-            if guard.last_time == tdb
+            if guard.last_time.to_bits() == tdb.to_bits()
                 && let Some(cached) = guard.equator
             {
                 return cached;
@@ -282,7 +282,7 @@ impl<R: RotationModel> RotationModel for CachingRotationModel<R> {
         }
         let computed = self.inner.equator_orientation_at_time(tdb);
         let mut guard = self.lock_cache();
-        if guard.last_time != tdb {
+        if guard.last_time.to_bits() != tdb.to_bits() {
             guard.last_time = tdb;
             guard.spin = None;
             guard.angular_velocity = None;
@@ -294,7 +294,7 @@ impl<R: RotationModel> RotationModel for CachingRotationModel<R> {
     fn angular_velocity_at_time(&self, tdb: f64) -> DVec3 {
         {
             let guard = self.lock_cache();
-            if guard.last_time == tdb
+            if guard.last_time.to_bits() == tdb.to_bits()
                 && let Some(cached) = guard.angular_velocity
             {
                 return cached;
@@ -302,7 +302,7 @@ impl<R: RotationModel> RotationModel for CachingRotationModel<R> {
         }
         let computed = self.inner.angular_velocity_at_time(tdb);
         let mut guard = self.lock_cache();
-        if guard.last_time != tdb {
+        if guard.last_time.to_bits() != tdb.to_bits() {
             guard.last_time = tdb;
             guard.spin = None;
             guard.equator = None;
