@@ -10,5 +10,8 @@ license.workspace = true
 alestia-math.workspace = true
 alestia-util.workspace = true
 
+[dev-dependencies]
+proptest.workspace = true
+
 [lints]
 workspace = true
