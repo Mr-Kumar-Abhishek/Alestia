@@ -360,7 +360,7 @@ mod tests {
 
     #[test]
     fn serialize_zero() {
-        assert!(R128::from_parts(0, 0).to_string().is_empty());
+        assert_eq!(R128::from_parts(0, 0).to_string(), "");
     }
 
     #[test]
@@ -414,8 +414,8 @@ mod tests {
                 bytes[length - 1] = ch;
                 let expected = match length % 4 {
                     0 => true,
-                    2 => (i & 0xF) == 0,
-                    3 => (i & 0x3) == 0,
+                    2 => i.trailing_zeros() >= 4,
+                    3 => i.trailing_zeros() >= 2,
                     _ => false,
                 };
                 let s = std::str::from_utf8(&bytes).map_err(|e| e.to_string())?;

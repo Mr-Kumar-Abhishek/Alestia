@@ -170,23 +170,23 @@ mod tests {
 
         logger.error(format_args!("number={}\n", 123));
         assert_eq!(take_utf8(&mut logger.err_sink)?, "number=123\n");
-        assert!(logger.log_sink().is_empty());
+        assert_eq!(logger.log_sink(), &[]);
 
         logger.warn(format_args!("string={}\n", "foobar"));
         assert_eq!(take_utf8(&mut logger.err_sink)?, "string=foobar\n");
-        assert!(logger.log_sink().is_empty());
+        assert_eq!(logger.log_sink(), &[]);
 
         logger.info(format_args!("hello world\n"));
-        assert!(logger.err_sink().is_empty());
+        assert_eq!(logger.err_sink(), &[]);
         assert_eq!(take_utf8(&mut logger.log_sink)?, "hello world\n");
 
         logger.verbose(format_args!("hi there\n"));
-        assert!(logger.err_sink().is_empty());
-        assert!(logger.log_sink().is_empty());
+        assert_eq!(logger.err_sink(), &[]);
+        assert_eq!(logger.log_sink(), &[]);
 
         logger.debug(format_args!("s={} e={}\n", 1, 'a'));
-        assert!(logger.err_sink().is_empty());
-        assert!(logger.log_sink().is_empty());
+        assert_eq!(logger.err_sink(), &[]);
+        assert_eq!(logger.log_sink(), &[]);
         Ok(())
     }
 
@@ -207,7 +207,7 @@ mod tests {
         assert_eq!(take_utf8(&mut logger.log_sink)?, "hi there\n");
 
         logger.debug(format_args!("s={} e={}\n", 1, 'a'));
-        assert!(logger.err_sink().is_empty());
+        assert_eq!(logger.err_sink(), &[]);
         Ok(())
     }
 
@@ -221,8 +221,8 @@ mod tests {
         logger.info(format_args!("info\n"));
         logger.verbose(format_args!("verb\n"));
         logger.debug(format_args!("dbg\n"));
-        assert!(logger.log_sink().is_empty());
-        assert!(logger.err_sink().is_empty());
+        assert_eq!(logger.log_sink(), &[]);
+        assert_eq!(logger.err_sink(), &[]);
         Ok(())
     }
 
@@ -235,8 +235,8 @@ mod tests {
         logger.info(format_args!("info\n"));
         logger.verbose(format_args!("verb\n"));
         logger.debug(format_args!("dbg\n"));
-        assert!(logger.log_sink().is_empty());
-        assert!(logger.err_sink().is_empty());
+        assert_eq!(logger.log_sink(), &[]);
+        assert_eq!(logger.err_sink(), &[]);
         Ok(())
     }
 
@@ -253,7 +253,7 @@ mod tests {
         assert_eq!(take_utf8(&mut logger.log_sink)?, "verb\n");
         logger.debug(format_args!("s={} e={}\n", 1, 'a'));
         assert_eq!(take_utf8(&mut logger.err_sink)?, "s=1 e=a\n");
-        assert!(logger.log_sink().is_empty());
+        assert_eq!(logger.log_sink(), &[]);
         Ok(())
     }
 
