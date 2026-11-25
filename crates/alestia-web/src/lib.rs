@@ -40,11 +40,15 @@ pub fn r128_decode_base64(encoded: &str) -> Result<f64, String> {
         .ok_or_else(|| format!("Invalid R128 Base64 coordinate: {encoded:?}"))
 }
 
-/// Expand Celestia 3-letter Greek Bayer abbreviations (e.g., `"ALF Cen"` -> `"α Cen"`).
+/// Expand Celestia 3-letter Greek Bayer abbreviations (e.g., `"ALF Cen"` -> `"α Cen"`), one designation per line.
 #[must_use]
 #[wasm_bindgen]
 pub fn expand_greek_bayer(input: &str) -> String {
-    replace_greek_letter_abbr(input)
+    input
+        .lines()
+        .map(|line| replace_greek_letter_abbr(line.trim()))
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 /// Parse a `#rrggbb` or `#rrggbbaa` hexadecimal color string into normalized sRGB and RGBA summary text.
@@ -156,9 +160,13 @@ mod tests {
 
     #[test]
     fn expands_greek_bayer_abbreviations() -> Result<(), String> {
-        let expanded = expand_greek_bayer("ALF Cen / XI12 Bar");
-        if expanded != "α Cen / ξ¹² Bar" {
-            return Err(format!("Unexpected Bayer expansion: {expanded}"));
+        let single = expand_greek_bayer("XI12 Bar");
+        if single != "ξ¹² Bar" {
+            return Err(format!("Unexpected single Bayer expansion: {single}"));
+        }
+        let multi = expand_greek_bayer("ALF Cen\nXI12 Bar");
+        if multi != "α Cen\nξ¹² Bar" {
+            return Err(format!("Unexpected multiline Bayer expansion: {multi}"));
         }
         Ok(())
     }
