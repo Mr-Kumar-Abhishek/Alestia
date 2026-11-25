@@ -659,13 +659,14 @@ mod tests {
         cur_offset += 4;
         // DE number = 440
         push_u32(&mut w, 440, le);
-        // Libration info: 0 coeffs
+        // Libration info: 300 coeffs x 1 granule x 3 comps keeps the record larger than the header,
+        // as in real ephemeris files where the header fits inside the first two records.
         push_u32(&mut w, cur_offset, le);
-        push_u32(&mut w, 0, le);
-        push_u32(&mut w, 0, le);
+        push_u32(&mut w, 300, le);
+        push_u32(&mut w, 1, le);
 
-        // Record size = 2 (t0,t1) + 11*9 + 4 = 105 doubles.
-        let record_size = 105_usize;
+        // Record size = 2 (t0,t1) + 11*9 + 4 + 900 libration = 1005 doubles.
+        let record_size = 1005_usize;
         let rec_bytes = record_size * 8;
         while w.as_slice().len() < 2 * rec_bytes {
             w.write_u8(0);
