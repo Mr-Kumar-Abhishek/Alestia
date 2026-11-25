@@ -43,24 +43,27 @@ impl R128 {
 
     /// Construct from Celestia's `(lo, hi)` 64-bit little-endian limb pair.
     #[must_use]
-    #[allow(clippy::cast_possible_wrap)]
     pub const fn from_parts(lo: u64, hi: u64) -> Self {
-        let raw = ((hi as i128) << 64) | (lo as i128);
+        let raw = ((u128::from(hi) << 64) | u128::from(lo)).cast_signed();
         Self { raw }
     }
 
     /// Return the lower 64 fractional bits.
     #[must_use]
-    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     pub const fn lo(self) -> u64 {
-        (self.raw as u128) as u64
+        let bytes = self.raw.to_le_bytes();
+        u64::from_le_bytes([
+            bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7],
+        ])
     }
 
     /// Return the upper 64 signed integer bits as a `u64` bit pattern.
     #[must_use]
-    #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
     pub const fn hi(self) -> u64 {
-        ((self.raw as u128) >> 64) as u64
+        let bytes = self.raw.to_le_bytes();
+        u64::from_le_bytes([
+            bytes[8], bytes[9], bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15],
+        ])
     }
 
     /// Convert an `f64` into `64.64` fixed-point representation.
@@ -68,7 +71,11 @@ impl R128 {
     /// Non-finite inputs return [`R128::ZERO`]; out-of-range finite values saturate at
     /// [`R128::MIN`] or [`R128::MAX`].
     #[must_use]
-    #[allow(clippy::cast_possible_truncation, clippy::cast_precision_loss)]
+    #[expect(
+        clippy::cast_possible_truncation,
+        clippy::cast_precision_loss,
+        reason = "intentional f64 to 64.64 fixed-point quantization within checked i64 bounds"
+    )]
     pub fn from_f64(value: f64) -> Self {
         if !value.is_finite() {
             return Self::ZERO;
@@ -90,7 +97,10 @@ impl R128 {
 
     /// Convert `64.64` fixed-point value to `f64`.
     #[must_use]
-    #[allow(clippy::cast_precision_loss)]
+    #[expect(
+        clippy::cast_precision_loss,
+        reason = "64.64 fixed-point has 128 bits while IEEE-754 f64 has 53 significand bits"
+    )]
     pub fn to_f64(self) -> f64 {
         let hi = (self.raw >> 64) as f64;
         let lo = (self.lo() as f64) / FRAC_SCALE;
@@ -128,7 +138,6 @@ impl R128 {
     ///
     /// Computes `(self * rhs) >> 64` using exact 256-bit intermediate arithmetic.
     #[must_use]
-    #[allow(clippy::cast_sign_loss)]
     pub const fn checked_mul(self, rhs: Self) -> Option<Self> {
         let neg = (self.raw < 0) ^ (rhs.raw < 0);
         let a = self.raw.unsigned_abs();
@@ -162,18 +171,19 @@ impl R128 {
             return None;
         }
         let mag = (hi128 << 64) | (lo64 >> 64);
+        let max_pos = i128::MAX.cast_unsigned();
         if neg {
-            if mag > (i128::MAX as u128) + 1 {
+            if mag > max_pos + 1 {
                 return None;
             }
-            if mag == (i128::MAX as u128) + 1 {
+            if mag == max_pos + 1 {
                 Some(Self::MIN)
             } else {
                 Some(Self {
                     raw: -(mag.cast_signed()),
                 })
             }
-        } else if mag > (i128::MAX as u128) {
+        } else if mag > max_pos {
             None
         } else {
             Some(Self {
@@ -245,7 +255,6 @@ impl R128 {
     /// than 22 characters or with `len % 4 == 1`, rejects non-alphabet characters, and rejects
     /// non-zero unused trailing padding bits.
     #[must_use]
-    #[allow(clippy::cast_possible_truncation)]
     pub fn decode_base64(input: &str) -> Option<Self> {
         let trimmed = input.trim_end_matches('=');
         if trimmed.is_empty() {
@@ -267,9 +276,10 @@ impl R128 {
             accum |= u32::from(decoded);
             group_idx += 1;
             if group_idx == 4 {
-                *processed.get_mut(processed_idx)? = (accum >> 16) as u8;
-                *processed.get_mut(processed_idx + 1)? = ((accum >> 8) & 0xFF) as u8;
-                *processed.get_mut(processed_idx + 2)? = (accum & 0xFF) as u8;
+                let bytes = accum.to_be_bytes();
+                *processed.get_mut(processed_idx)? = bytes[1];
+                *processed.get_mut(processed_idx + 1)? = bytes[2];
+                *processed.get_mut(processed_idx + 2)? = bytes[3];
                 processed_idx += 3;
                 accum = 0;
                 group_idx = 0;
@@ -280,12 +290,13 @@ impl R128 {
 
         if group_idx != 0 {
             accum <<= 18 - (6 * group_idx);
-            *processed.get_mut(processed_idx)? = (accum >> 16) as u8;
+            let bytes = accum.to_be_bytes();
+            *processed.get_mut(processed_idx)? = bytes[1];
             if group_idx == 3 {
                 if (last_decoded & 0x03) != 0 {
                     return None;
                 }
-                *processed.get_mut(processed_idx + 1)? = ((accum >> 8) & 0xFF) as u8;
+                *processed.get_mut(processed_idx + 1)? = bytes[2];
             } else if (last_decoded & 0x0F) != 0 {
                 return None;
             }

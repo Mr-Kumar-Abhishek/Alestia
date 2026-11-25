@@ -146,7 +146,11 @@ impl AssociativeArray {
 
     /// Retrieve an integer value by key if finite and within `i64` bounds.
     #[must_use]
-    #[allow(clippy::cast_possible_truncation, clippy::cast_precision_loss)]
+    #[expect(
+        clippy::cast_possible_truncation,
+        clippy::cast_precision_loss,
+        reason = "checked finite and bounded within [i64::MIN, i64::MAX]"
+    )]
     pub fn get_i64(&self, key: &str) -> Option<i64> {
         let v = self.get_number(key)?;
         if v.is_finite() && v >= (i64::MIN as f64) && v <= (i64::MAX as f64) {
@@ -199,7 +203,10 @@ impl AssociativeArray {
 
     /// Retrieve a [`Color`] from a 3-element array, 4-element array, or `#rrggbb`/`#rrggbbaa` string.
     #[must_use]
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(
+        clippy::cast_possible_truncation,
+        reason = "Color stores normalized f32 RGBA channels matching Celestia's float Color API"
+    )]
     pub fn get_color(&self, key: &str) -> Option<Color> {
         match self.get(key)? {
             Value::String(hex) => Color::parse_hex(hex),
@@ -225,7 +232,11 @@ impl AssociativeArray {
 mod tests {
     use super::*;
 
-    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    #[expect(
+        clippy::cast_possible_truncation,
+        clippy::cast_sign_loss,
+        reason = "mirrors Celestia's unsigned char quantization formula in associativearray_test.cpp"
+    )]
     fn quantize_ref(n: f32) -> f32 {
         f32::from((n * 255.99_f32) as u8) / 255.0_f32
     }

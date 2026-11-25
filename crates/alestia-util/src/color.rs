@@ -150,7 +150,11 @@ pub fn linear_to_srgb(c: f32) -> f32 {
     }
 }
 
-#[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+#[expect(
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    reason = "clamped to [0.0, 1.0] before scaling to 0..=255"
+)]
 fn quantize_channel(v: f32) -> u8 {
     if !v.is_finite() {
         return 0;
@@ -177,9 +181,8 @@ mod tests {
 
     #[test]
     fn srgb_linear_roundtrip_accurate() {
-        for i in 0..=100 {
-            #[allow(clippy::cast_precision_loss)]
-            let srgb = (i as f32) / 100.0;
+        for i in 0_u16..=100 {
+            let srgb = f32::from(i) / 100.0;
             let lin = srgb_to_linear(srgb);
             let back = linear_to_srgb(lin);
             assert!((back - srgb).abs() < 1e-6, "srgb={srgb}, back={back}");

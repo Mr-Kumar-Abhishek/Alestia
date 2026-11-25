@@ -16,11 +16,23 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
-      - run: cargo fmt --all -- --check
-      - run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: Enforce Tier-1 unsafe_code forbid policy
+        shell: bash
+        run: |
+          for crate in alestia-util alestia-math alestia-astro alestia-model alestia-image alestia-font alestia-engine alestia-core; do
+            head -n 1 "crates/${crate}/src/lib.rs" | grep -qx '#!\[forbid(unsafe_code)\]'
+          done
+          head -n 1 "crates/alestia-tools/src/main.rs" | grep -qx '#!\[forbid(unsafe_code)\]'
+      - name: Enforce rustfmt across workspace
+        run: cargo fmt --all -- --check
+      - name: Enforce Clippy pedantic & strict lints (debug targets)
+        run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: Enforce Clippy pedantic & strict lints (release targets)
+        run: cargo clippy --workspace --release --all-targets -- -D warnings
       - uses: EmbarkStudios/cargo-deny-action@v2
 
   test-matrix:
+    needs: lint-and-policy
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -39,6 +51,7 @@ jobs:
         run: cargo test --doc --workspace --profile dev
 
   coverage:
+    needs: lint-and-policy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

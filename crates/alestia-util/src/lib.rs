@@ -28,6 +28,9 @@ pub mod strnatcmp;
 pub mod tokenizer;
 pub mod unicode;
 
+/// Crate version string.
+pub const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");
+
 pub use associative_array::{AssociativeArray, Value, ValueType};
 pub use binary::{BinaryError, BinaryReader, BinaryWriter};
 pub use color::{Color, linear_to_srgb, srgb_to_linear};
